@@ -1,7 +1,7 @@
 import { randomBytes } from "crypto";
 import { defineCommand } from "../../core/define-command.ts";
 import { profileExists, setProfile } from "../../config/index.ts";
-import { confirm } from "../../core/ui.ts";
+import { confirm, openBrowser } from "../../core/ui.ts";
 import { logger } from "../../core/logger.ts";
 
 const DASHBOARD_URL = process.env.BUNNYNET_DASHBOARD_URL ?? "https://dash.bunny.net";
@@ -122,15 +122,3 @@ export const authLoginCommand = defineCommand<{ force: boolean }>({
   },
 });
 
-function openBrowser(url: string) {
-  const cmds: Record<string, string[]> = {
-    darwin: ["open", url],
-    linux: ["xdg-open", url],
-    win32: ["rundll32", "url.dll,FileProtocolHandler", url],
-  };
-
-  const args = cmds[process.platform];
-  if (args) {
-    Bun.spawn(args, { stdio: ["ignore", "ignore", "ignore"] });
-  }
-}

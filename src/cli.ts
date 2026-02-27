@@ -5,6 +5,7 @@ import { authLogoutCommand } from "./commands/auth/logout.ts";
 import { configNamespace } from "./commands/config/index.ts";
 import { dbNamespace } from "./commands/db/index.ts";
 import { scriptsNamespace } from "./commands/scripts/index.ts";
+import { docsCommand } from "./commands/docs.ts";
 import { whoamiCommand } from "./commands/whoami.ts";
 import { logger } from "./core/logger.ts";
 import { VERSION } from "./core/version.ts";
@@ -46,6 +47,7 @@ export const cli = yargs(hideBin(process.argv))
   .command(authLogoutCommand)
   .command(configNamespace)
   .command(dbNamespace)
+  .command(docsCommand)
   .command(scriptsNamespace)
   .command(whoamiCommand)
 
