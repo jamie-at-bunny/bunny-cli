@@ -86,6 +86,10 @@ bunny config profile delete staging
 
 Manage databases.
 
+Most `db` commands accept an optional `<database-id>` positional argument. When omitted, the CLI walks up the directory tree looking for a `.env` file containing `BUNNY_DATABASE_URL` and matches it against your database list to auto-detect the database.
+
+For `db shell`, the CLI also reads `BUNNY_DATABASE_AUTH_TOKEN` from `.env` to skip token generation. Both variables can be set by `db quickstart`.
+
 #### `bunny db create`
 
 Create a new database. Interactively prompts for name and region selection (automatic, single region, or manual) when flags are omitted.
@@ -168,13 +172,13 @@ bunny db shell --unmask
 bunny db shell --url libsql://... --token ey...
 ```
 
-| Flag       | Alias | Description                                                |
-| ---------- | ----- | ---------------------------------------------------------- |
+| Flag        | Alias | Description                                                |
+| ----------- | ----- | ---------------------------------------------------------- |
 | `--execute` | `-e`  | Execute a SQL statement and exit                           |
-| `--mode`   | `-m`  | Output mode: `default`, `table`, `json`, `csv`, `markdown` |
-| `--unmask` |       | Show sensitive column values unmasked                      |
-| `--url`    |       | Database URL (skips API lookup)                            |
-| `--token`  |       | Auth token (skips token generation)                        |
+| `--mode`    | `-m`  | Output mode: `default`, `table`, `json`, `csv`, `markdown` |
+| `--unmask`  |       | Show sensitive column values unmasked                      |
+| `--url`     |       | Database URL (skips API lookup)                            |
+| `--token`   |       | Auth token (skips token generation)                        |
 
 **Dot-commands** (available in interactive mode):
 
