@@ -101,12 +101,12 @@ bunny db create --name mydb --primary FR
 bunny db create --name mydb --primary FR,DE --replicas UK,NY
 ```
 
-| Flag | Description |
-| --- | --- |
-| `--name` | Database name |
-| `--primary` | Comma-separated primary region IDs (e.g. `FR` or `FR,DE`) |
-| `--replicas` | Comma-separated replica region IDs (e.g. `UK,NY`) |
-| `--storage-region` | Override auto-detected storage region |
+| Flag               | Description                                               |
+| ------------------ | --------------------------------------------------------- |
+| `--name`           | Database name                                             |
+| `--primary`        | Comma-separated primary region IDs (e.g. `FR` or `FR,DE`) |
+| `--replicas`       | Comma-separated replica region IDs (e.g. `UK,NY`)         |
+| `--storage-region` | Override auto-detected storage region                     |
 
 #### `bunny db list`
 
@@ -114,7 +114,6 @@ List all databases.
 
 ```bash
 bunny db list
-bunny db list --group-id group_01ABC123
 bunny db list --output json
 ```
 
@@ -169,33 +168,33 @@ bunny db shell --unmask
 bunny db shell --url libsql://... --token ey...
 ```
 
-| Flag | Alias | Description |
-| --- | --- | --- |
-| `--exec` | `-e` | Execute a SQL statement and exit |
-| `--mode` | `-m` | Output mode: `default`, `table`, `json`, `csv`, `markdown` |
-| `--unmask` | | Show sensitive column values unmasked |
-| `--url` | | Database URL (skips API lookup) |
-| `--token` | | Auth token (skips token generation) |
+| Flag       | Alias | Description                                                |
+| ---------- | ----- | ---------------------------------------------------------- |
+| `--exec`   | `-e`  | Execute a SQL statement and exit                           |
+| `--mode`   | `-m`  | Output mode: `default`, `table`, `json`, `csv`, `markdown` |
+| `--unmask` |       | Show sensitive column values unmasked                      |
+| `--url`    |       | Database URL (skips API lookup)                            |
+| `--token`  |       | Auth token (skips token generation)                        |
 
 **Dot-commands** (available in interactive mode):
 
-| Command | Description |
-| --- | --- |
-| `.tables` | List all tables |
-| `.describe TABLE` | Show column details for a table |
-| `.schema [TABLE]` | Show CREATE statements |
-| `.indexes [TABLE]` | List indexes |
-| `.count TABLE` | Count rows in a table |
-| `.size TABLE` | Show table stats (rows, columns, indexes) |
-| `.dump [TABLE]` | Dump schema and data as SQL |
-| `.read FILE` | Execute SQL statements from a file |
-| `.mode [MODE]` | Set output mode |
-| `.timing` | Toggle query execution timing |
-| `.mask` | Enable sensitive column masking |
-| `.unmask` | Disable sensitive column masking |
-| `.clear-history` | Clear command history |
-| `.help` | Show available commands |
-| `.quit` / `.exit` | Exit the shell |
+| Command            | Description                               |
+| ------------------ | ----------------------------------------- |
+| `.tables`          | List all tables                           |
+| `.describe TABLE`  | Show column details for a table           |
+| `.schema [TABLE]`  | Show CREATE statements                    |
+| `.indexes [TABLE]` | List indexes                              |
+| `.count TABLE`     | Count rows in a table                     |
+| `.size TABLE`      | Show table stats (rows, columns, indexes) |
+| `.dump [TABLE]`    | Dump schema and data as SQL               |
+| `.read FILE`       | Execute SQL statements from a file        |
+| `.mode [MODE]`     | Set output mode                           |
+| `.timing`          | Toggle query execution timing             |
+| `.mask`            | Enable sensitive column masking           |
+| `.unmask`          | Disable sensitive column masking          |
+| `.clear-history`   | Clear command history                     |
+| `.help`            | Show available commands                   |
+| `.quit` / `.exit`  | Exit the shell                            |
 
 **Sensitive column masking**: Columns matching patterns like `password`, `secret`, `api_key`, `auth_token`, `ssn`, etc. are masked by default (`********`). Email columns are partially masked (`a••••e@example.com`). Use `.unmask` or `--unmask` to reveal values.
 
@@ -218,9 +217,9 @@ bunny db tokens create --expiry 30d
 bunny db tokens create --expiry 2026-12-31T23:59:59Z
 ```
 
-| Flag | Description |
-| --- | --- |
-| `--read-only` | Generate a read-only token (default: full access) |
+| Flag           | Description                                                               |
+| -------------- | ------------------------------------------------------------------------- |
+| `--read-only`  | Generate a read-only token (default: full access)                         |
 | `-e, --expiry` | Token expiry — duration (`30d`, `12h`, `1w`, `1m`, `1y`) or RFC 3339 date |
 
 #### `bunny db tokens invalidate`
@@ -248,14 +247,14 @@ bunny scripts init
 bunny scripts init --name my-script --type standalone --template Empty --deploy
 ```
 
-| Flag | Description |
-| --- | --- |
-| `--name` | Project directory name |
-| `--type` | Script type: `standalone` or `middleware` |
-| `--template` | Template name |
-| `--deploy` | Deploy after creation |
-| `--skip-git` | Skip git initialization |
-| `--skip-install` | Skip dependency installation |
+| Flag             | Description                               |
+| ---------------- | ----------------------------------------- |
+| `--name`         | Project directory name                    |
+| `--type`         | Script type: `standalone` or `middleware` |
+| `--template`     | Template name                             |
+| `--deploy`       | Deploy after creation                     |
+| `--skip-git`     | Skip git initialization                   |
+| `--skip-install` | Skip dependency installation              |
 
 #### `bunny scripts link`
 
@@ -290,33 +289,33 @@ bunny scripts show
 
 ## Global Options
 
-| Flag | Alias | Description | Default |
-| --- | --- | --- | --- |
-| `--profile` | `-p` | Configuration profile to use | `default` |
-| `--verbose` | `-v` | Enable verbose output | `false` |
-| `--output` | `-o` | Output format: `text`, `json`, `table`, `csv`, or `markdown` | `text` |
-| `--api-key` | | API key (takes priority over profile and environment) | |
-| `--version` | | Show version | |
-| `--help` | | Show help | |
+| Flag        | Alias | Description                                                  | Default   |
+| ----------- | ----- | ------------------------------------------------------------ | --------- |
+| `--profile` | `-p`  | Configuration profile to use                                 | `default` |
+| `--verbose` | `-v`  | Enable verbose output                                        | `false`   |
+| `--output`  | `-o`  | Output format: `text`, `json`, `table`, `csv`, or `markdown` | `text`    |
+| `--api-key` |       | API key (takes priority over profile and environment)        |           |
+| `--version` |       | Show version                                                 |           |
+| `--help`    |       | Show help                                                    |           |
 
 ### Output Formats
 
-| Format | Description |
-| --- | --- |
-| `text` | Human-friendly borderless tables with bold headers (default) |
-| `json` | Structured JSON for scripting and piping |
-| `table` | Bordered ASCII table |
-| `csv` | Comma-separated values with proper escaping |
-| `markdown` | GitHub-flavored pipe tables |
+| Format     | Description                                                  |
+| ---------- | ------------------------------------------------------------ |
+| `text`     | Human-friendly borderless tables with bold headers (default) |
+| `json`     | Structured JSON for scripting and piping                     |
+| `table`    | Bordered ASCII table                                         |
+| `csv`      | Comma-separated values with proper escaping                  |
+| `markdown` | GitHub-flavored pipe tables                                  |
 
 ## Environment Variables
 
-| Variable | Description |
-| --- | --- |
-| `BUNNYNET_API_KEY` | API key (overrides profile-based key) |
-| `BUNNYNET_API_URL` | API base URL (default: `https://api.bunny.net`) |
+| Variable                 | Description                                                     |
+| ------------------------ | --------------------------------------------------------------- |
+| `BUNNYNET_API_KEY`       | API key (overrides profile-based key)                           |
+| `BUNNYNET_API_URL`       | API base URL (default: `https://api.bunny.net`)                 |
 | `BUNNYNET_DASHBOARD_URL` | Dashboard URL for auth flow (default: `https://dash.bunny.net`) |
-| `NO_COLOR` | Disable colored output ([no-color.org](https://no-color.org)) |
+| `NO_COLOR`               | Disable colored output ([no-color.org](https://no-color.org))   |
 
 ## Development
 
