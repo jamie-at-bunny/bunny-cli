@@ -1,0 +1,2553 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "bunny.net Compute API",
+    "description": "<img src='https://bunny.net/v2/images/bunnynet-logo-dark.svg' style='width: 200px;' alt='bunny.net Logo'>\n               Edge Scripts and Compute API documentation for bunny.net. This API provides endpoints for managing edge scripts, releases, secrets, variables, and other compute-related resources.",
+    "termsOfService": "https://bunny.net/tos",
+    "contact": {
+      "name": "bunny.net",
+      "url": "https://docs.bunny.net",
+      "email": "support@bunny.net"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.bunny.net",
+      "description": "bunny.net API Server"
+    }
+  ],
+  "security": [
+    {
+      "AccessKey": []
+    }
+  ],
+  "paths": {
+    "/compute/script/{id}/code": {
+      "get": {
+        "tags": [
+          "Code"
+        ],
+        "summary": "Get Code",
+        "operationId": "GetEdgeScriptCodeEndpoint_GetCode",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the code for which the script that will be returned",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The code of the script with the requested ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EdgeScriptCodeModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The script with the requested ID does not exist."
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Code"
+        ],
+        "summary": "Set Code",
+        "operationId": "UploadEdgeScriptCodeEndpoint_SetCode",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the code for which the script that will be returned",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "model",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEdgeScriptCodeModel"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": "The code was successfully uploaded"
+          },
+          "404": {
+            "description": "The script with the requested ID does not exist."
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      }
+    },
+    "/compute/script/{id}": {
+      "delete": {
+        "tags": [
+          "Edge Script"
+        ],
+        "summary": "Delete Edge Script",
+        "operationId": "DeleteEdgeScriptEndpoint_Delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the script that will be deleted.",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "deleteLinkedPullZones",
+            "in": "query",
+            "description": "Deletes all pull zones linked to this edge script if true, otherwise changes origin to landing page",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The script was successfully deleted."
+          },
+          "404": {
+            "description": "The script with the requested ID does not exist."
+          },
+          "400": {
+            "description": "Failed deleting the script. See error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorData"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Edge Script"
+        ],
+        "summary": "Get Edge Script",
+        "operationId": "GetEdgeScriptByIdEndpoint_GetEdgeScriptById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the script that will be returned",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The script with the requested ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EdgeScriptModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The script with the requested ID does not exist."
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Edge Script"
+        ],
+        "summary": "Update Edge Script",
+        "operationId": "UpdateEdgeScriptEndpoint_Update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the script that will be updated",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "model",
+          "description": "The configuration that should be applied to the script",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEdgeScriptModel"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "The script with the requested ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EdgeScriptModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The script with the requested ID does not exist."
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      }
+    },
+    "/compute/script/{id}/statistics": {
+      "get": {
+        "tags": [
+          "Edge Script"
+        ],
+        "summary": "Get Edge Script Statistics",
+        "operationId": "EdgeScriptStatisticsEndpoint_GetEdgeScriptStatisticsEndpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the Edge Script for which the statistics will be returned",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "dateFrom",
+            "in": "query",
+            "description": "(Optional) The start date of the statistics. If no value is passed, the last 30 days will be returned",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
+            "name": "dateTo",
+            "in": "query",
+            "description": "(Optional) The end date of the statistics. If no value is passed, the last 30 days will be returned",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "x-position": 3
+          },
+          {
+            "name": "loadLatest",
+            "in": "query",
+            "description": "(Optional) Load most recent data as soon as it's available",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 4
+          },
+          {
+            "name": "hourly",
+            "in": "query",
+            "description": "(Optional) If true, the statistics data will be returned in hourly groupping.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the statistics for the Edge Script with the given ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EdgeScriptStatisticsModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The Edge Script with the requested ID does not exist"
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      }
+    },
+    "/compute/script": {
+      "get": {
+        "tags": [
+          "Edge Script"
+        ],
+        "summary": "List Edge Scripts",
+        "operationId": "ListEdgeScriptsEndpoint_ListEdgeScriptsByAccount",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "description": "Filter by edge script type",
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "$ref": "#/components/schemas/EdgeScriptTypes2"
+              }
+            },
+            "x-position": 1
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1,
+              "maximum": 2147483647.0,
+              "minimum": 1.0
+            },
+            "x-position": 2
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000,
+              "maximum": 1000.0,
+              "minimum": 5.0
+            },
+            "x-position": 3
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "The search term that will be used to filter the results",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 4
+          },
+          {
+            "name": "includeLinkedPullzones",
+            "in": "query",
+            "description": "Include linked pullzones",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 5
+          },
+          {
+            "name": "integrationId",
+            "in": "query",
+            "description": "Filter by linked integration",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "nullable": true
+            },
+            "x-position": 6
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The list of scripts on the account.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationListModelOfEdgeScriptModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Edge Script"
+        ],
+        "summary": "Add Edge Script",
+        "operationId": "CreateEdgeScriptEndpoint_AddScript",
+        "requestBody": {
+          "x-name": "edgeScriptModel",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddEdgeScriptModel"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "201": {
+            "description": "The script was successfully added",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EdgeScriptModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Failed adding the script. Model validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorData"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      }
+    },
+    "/compute/script/{id}/deploymentKey/rotate": {
+      "post": {
+        "tags": [
+          "Edge Script"
+        ],
+        "summary": "Rotate Deployment Key",
+        "operationId": "RotateEdgeScriptDeploymentKeyEndpoint_RotateEdgeScriptDeploymentKey",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the edge script that should have deployment key rotated",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The deployment key has been successfully rotated"
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "404": {
+            "description": "The Edge Script with the requested ID does not exist"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      }
+    },
+    "/compute/script/{id}/variables/add": {
+      "post": {
+        "tags": [
+          "Variable"
+        ],
+        "summary": "Add Variable",
+        "operationId": "AddEdgeScriptVariableEndpoint_AddEdgeScriptVariable",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the script that will be updated",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "model",
+          "description": "The variable that will be added",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddEdgeScriptVariableModel"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "The script with the requested ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EdgeScriptVariableModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The script with the requested ID does not exist."
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      }
+    },
+    "/compute/script/{id}/variables/{variableId}": {
+      "delete": {
+        "tags": [
+          "Variable"
+        ],
+        "summary": "Delete Variable",
+        "operationId": "DeleteEdgeScriptVariableEndpoint_DeleteVariable",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the script that contains the Environment Variable",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "variableId",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the Environment Variable that should be deleted",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The environment variable was successfully deleted."
+          },
+          "404": {
+            "description": "The environment variable or script with the requested ID does not exist."
+          },
+          "400": {
+            "description": "Failed deleting the environment variable. See error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorData"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Variable"
+        ],
+        "summary": "Get Variable",
+        "operationId": "GetEdgeScriptVariableEndpoint_GetVariable",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the script that contains the variable",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "variableId",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the Environment Variable that should be returned",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The script with the requested ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EdgeScriptVariableModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The script with the requested ID does not exist."
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Variable"
+        ],
+        "summary": "Update Variable",
+        "operationId": "UpdateEdgeScriptVariableEndpoint_UpdateVariable",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the script that contains the variable",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "variableId",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the Environment Variable that will be updated",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "model",
+          "description": "The variable that will be added",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEdgeScriptVariableModel"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "200": {
+            "description": "The script with the requested ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EdgeScriptVariableModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The script with the requested ID does not exist."
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      }
+    },
+    "/compute/script/{id}/variables": {
+      "put": {
+        "tags": [
+          "Variable"
+        ],
+        "summary": "Upsert Variable",
+        "operationId": "UpsertEdgeScriptVariableEndpoint_UpsertEdgeScriptVariable",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the script which will have the variable upserted",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "model",
+          "description": "The variable that will be upserted",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertEdgeScriptVariableModel"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "The variable was created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EdgeScriptVariableModel"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "The variable was updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EdgeScriptVariableModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The script with the requested ID does not exist."
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      }
+    },
+    "/compute/script/{id}/secrets": {
+      "post": {
+        "tags": [
+          "Secret"
+        ],
+        "summary": "Add Secret",
+        "operationId": "AddEdgeScriptSecretEndpoint_AddEdgeScriptSecret",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the script that will have the secret added",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "model",
+          "description": "The secret that will be added",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EdgeScriptAddSecretModel"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "The script with the requested ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EdgeScriptSecretModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The script with the requested ID does not exist."
+          },
+          "400": {
+            "description": "The request validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorData"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Secret"
+        ],
+        "summary": "List Secrets",
+        "operationId": "ListEdgeScriptSecretsEndpoint_ListEdgeScriptSecrets",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the script to list secrets",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The list of secrets for the script.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListEdgeScriptSecretsModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Secret"
+        ],
+        "summary": "Upsert Secret",
+        "operationId": "UpsertEdgeScriptSecretEndpoint_UpsertEdgeScriptSecret",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the script that will have the secret upserted",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "model",
+          "description": "The secret that will be upserted",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EdgeScriptUpsertSecretModel"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "A new secret was created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EdgeScriptSecretModel"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "The secret with existing name was updated"
+          },
+          "404": {
+            "description": "The script with the requested ID does not exist."
+          },
+          "400": {
+            "description": "The request validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorData"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      }
+    },
+    "/compute/script/{id}/secrets/{secretId}": {
+      "delete": {
+        "tags": [
+          "Secret"
+        ],
+        "summary": "Delete Secret",
+        "operationId": "DeleteEdgeScriptSecretEndpoint_DeleteSecret",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the script that contains the secret",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "secretId",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the secret that should be deleted",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The secret was successfully deleted."
+          },
+          "404": {
+            "description": "The secret or script with the requested ID does not exist."
+          },
+          "400": {
+            "description": "Failed deleting the secret. See error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorData"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Secret"
+        ],
+        "summary": "Update Secret",
+        "operationId": "UpdateEdgeScriptSecretEndpoint_UpdateEdgeScriptSecret",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the script that will have the secret updated",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "secretId",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the secret that will be updated",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "model",
+          "description": "The secret that will be updated",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EdgeScriptUpdateSecretModel"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "200": {
+            "description": "The script with the requested ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EdgeScriptSecretModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The script with the requested ID does not exist."
+          },
+          "400": {
+            "description": "The request validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorData"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      }
+    },
+    "/compute/script/{id}/releases/active": {
+      "get": {
+        "tags": [
+          "Release"
+        ],
+        "summary": "Get Active Release",
+        "operationId": "GetEdgeScriptActiveReleaseEndpoint_GetCurrentlyActiveReleaseEndpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the script for which active release would be returned",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Currently active release of the script with the requested ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EdgeScriptReleaseModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The script with the requested ID does not exist or no active releases."
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      }
+    },
+    "/compute/script/{id}/releases": {
+      "get": {
+        "tags": [
+          "Release"
+        ],
+        "summary": "Get Releases",
+        "operationId": "GetEdgeScriptReleaseEndpoint_GetReleases",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the script for which published releases would be returned",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1,
+              "maximum": 2147483647.0,
+              "minimum": 1.0
+            },
+            "x-position": 2
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000,
+              "maximum": 1000.0,
+              "minimum": 5.0
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Published releases of the script with the requested ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationListModelOfEdgeScriptReleaseModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The script with the requested ID does not exist."
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      }
+    },
+    "/compute/script/{id}/publish": {
+      "post": {
+        "tags": [
+          "Release"
+        ],
+        "summary": "Publish Release",
+        "operationId": "PublishEdgeScriptReleaseEndpoint_Publish",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Publishes the current code as a release",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "description": "The UUID of the script release that will be published",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 3
+          }
+        ],
+        "requestBody": {
+          "x-name": "model",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishEdgeScriptModel"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": "The code version was successfully published"
+          },
+          "404": {
+            "description": "The script with the requested ID does not exist."
+          },
+          "400": {
+            "description": "The script has no active code."
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      }
+    },
+    "/compute/script/{id}/publish/{uuid}": {
+      "post": {
+        "tags": [
+          "Release"
+        ],
+        "summary": "Publish Release",
+        "operationId": "PublishEdgeScriptReleaseEndpoint_Publish2",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Publishes the current code as a release",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "description": "The UUID of the script release that will be published",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 3
+          }
+        ],
+        "requestBody": {
+          "x-name": "model",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishEdgeScriptModel"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": "The code version was successfully published"
+          },
+          "404": {
+            "description": "The script with the requested ID does not exist."
+          },
+          "400": {
+            "description": "The script has no active code."
+          },
+          "401": {
+            "description": "The request authorization failed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "AccessKey": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          },
+          {
+            "bearer": [
+              "User",
+              "UserApi",
+              "SubuserAPICompute",
+              "SubuserAPIDns",
+              "SubuserCompute",
+              "SubuserManage",
+              "SubuserAPIManage"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EdgeScriptCodeModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "LastModified": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiErrorData": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "ErrorKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "Field": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "EdgeScriptStatisticsModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "TotalRequestsServed": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "TotalCpuUsed": {
+            "type": "number",
+            "format": "double"
+          },
+          "TotalMonthlyCost": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "AverageCpuTimePerExecution": {
+            "type": "number",
+            "format": "double"
+          },
+          "RequestsServedChart": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          "AverageCpuTimeChart": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          "TotalCpuTimeChart": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        }
+      },
+      "EdgeScriptModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "LastModified": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ScriptType": {
+            "$ref": "#/components/schemas/EdgeScriptTypes"
+          },
+          "CurrentReleaseId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "EdgeScriptVariables": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/EdgeScriptVariableModel"
+            }
+          },
+          "Deleted": {
+            "type": "boolean"
+          },
+          "LinkedPullZones": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/LinkedPullZone"
+            }
+          },
+          "Integration": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SourceCodeIntegrationModel"
+              }
+            ]
+          },
+          "DefaultHostname": {
+            "type": "string",
+            "nullable": true
+          },
+          "SystemHostname": {
+            "type": "string",
+            "nullable": true
+          },
+          "DeploymentKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "RepositoryId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "IntegrationId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "MonthlyCost": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "MonthlyRequestCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "MonthlyCpuTime": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "EdgeScriptTypes": {
+        "type": "integer",
+        "description": "0 = DNS\n1 = CDN\n2 = Middleware",
+        "x-enumNames": [
+          "DNS",
+          "CDN",
+          "Middleware"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ]
+      },
+      "EdgeScriptVariableModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Required": {
+            "type": "boolean"
+          },
+          "DefaultValue": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "LinkedPullZone": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "PullZoneName": {
+            "type": "string",
+            "nullable": true
+          },
+          "DefaultHostname": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "SourceCodeIntegrationModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "IntegrationId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "RepositorySettings": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SourceCodeRepositorySettingsModel"
+              }
+            ]
+          },
+          "DeployConfiguration": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DeployConfigurationModel"
+              }
+            ]
+          }
+        }
+      },
+      "SourceCodeRepositorySettingsModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Private": {
+            "type": "boolean"
+          },
+          "TemplateUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "DeployConfigurationModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Branch": {
+            "type": "string",
+            "nullable": true
+          },
+          "InstallCommand": {
+            "type": "string",
+            "nullable": true
+          },
+          "BuildCommand": {
+            "type": "string",
+            "nullable": true
+          },
+          "EntryFile": {
+            "type": "string",
+            "nullable": true
+          },
+          "CreateWorkflow": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PaginationListModelOfEdgeScriptModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Items": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/EdgeScriptModel"
+            }
+          },
+          "CurrentPage": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TotalItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "HasMoreItems": {
+            "type": "boolean"
+          }
+        }
+      },
+      "EdgeScriptTypes2": {
+        "type": "integer",
+        "description": "0 = DNS\n1 = CDN\n2 = Middleware",
+        "x-enumNames": [
+          "DNS",
+          "CDN",
+          "Middleware"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ]
+      },
+      "UpdateEdgeScriptModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Name": {
+            "type": "string",
+            "maxLength": 100,
+            "nullable": true
+          },
+          "ScriptType": {
+            "$ref": "#/components/schemas/EdgeScriptTypes"
+          }
+        }
+      },
+      "AddEdgeScriptVariableModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "Name",
+          "Required"
+        ],
+        "properties": {
+          "Name": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1
+          },
+          "Required": {
+            "type": "boolean"
+          },
+          "DefaultValue": {
+            "type": "string",
+            "maxLength": 4096,
+            "nullable": true
+          }
+        }
+      },
+      "UpdateEdgeScriptVariableModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "DefaultValue": {
+            "type": "string",
+            "maxLength": 4096,
+            "nullable": true
+          },
+          "Required": {
+            "type": "boolean",
+            "nullable": true
+          }
+        }
+      },
+      "UpsertEdgeScriptVariableModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "Name"
+        ],
+        "properties": {
+          "Name": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1
+          },
+          "Required": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "DefaultValue": {
+            "type": "string",
+            "maxLength": 4096,
+            "nullable": true
+          }
+        }
+      },
+      "EdgeScriptSecretModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "LastModified": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "EdgeScriptAddSecretModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "Name"
+        ],
+        "properties": {
+          "Name": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1
+          },
+          "Secret": {
+            "type": "string",
+            "maxLength": 4096,
+            "nullable": true
+          }
+        }
+      },
+      "ListEdgeScriptSecretsModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Secrets": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/EdgeScriptSecretModel"
+            }
+          }
+        }
+      },
+      "EdgeScriptUpdateSecretModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Secret": {
+            "type": "string",
+            "maxLength": 4096,
+            "nullable": true
+          }
+        }
+      },
+      "EdgeScriptUpsertSecretModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Name": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "nullable": true
+          },
+          "Secret": {
+            "type": "string",
+            "maxLength": 4096,
+            "nullable": true
+          }
+        }
+      },
+      "EdgeScriptReleaseModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "Deleted": {
+            "type": "boolean"
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Uuid": {
+            "type": "string",
+            "nullable": true
+          },
+          "Note": {
+            "type": "string",
+            "nullable": true
+          },
+          "Author": {
+            "type": "string",
+            "nullable": true
+          },
+          "AuthorEmail": {
+            "type": "string",
+            "nullable": true
+          },
+          "CommitSha": {
+            "type": "string",
+            "nullable": true
+          },
+          "Status": {
+            "$ref": "#/components/schemas/EdgeScriptReleaseStatus"
+          },
+          "DateReleased": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "DatePublished": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "EdgeScriptReleaseStatus": {
+        "type": "integer",
+        "description": "0 = Archived\n1 = Live",
+        "x-enumNames": [
+          "Archived",
+          "Live"
+        ],
+        "enum": [
+          0,
+          1
+        ]
+      },
+      "PaginationListModelOfEdgeScriptReleaseModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Items": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/EdgeScriptReleaseModel"
+            }
+          },
+          "CurrentPage": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TotalItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "HasMoreItems": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PublishEdgeScriptModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Note": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "AddEdgeScriptModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Name": {
+            "type": "string",
+            "maxLength": 100,
+            "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "ScriptType": {
+            "$ref": "#/components/schemas/EdgeScriptTypes"
+          },
+          "CreateLinkedPullZone": {
+            "type": "boolean"
+          },
+          "LinkedPullZoneName": {
+            "type": "string",
+            "nullable": true
+          },
+          "Integration": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SourceCodeIntegrationModel"
+              }
+            ]
+          }
+        }
+      },
+      "UpdateEdgeScriptCodeModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Code": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "AccessKey": {
+        "type": "apiKey",
+        "description": "API Access Key authorization header",
+        "name": "AccessKey",
+        "in": "header"
+      },
+      "bearer": {
+        "type": "apiKey",
+        "description": "Bearer token authorization header",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  }
+}
