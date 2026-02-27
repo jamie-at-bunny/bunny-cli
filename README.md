@@ -122,7 +122,7 @@ bunny db list --output json
 Show usage statistics for a database.
 
 ```bash
-bunny db usage db_01KCHBG8C5KSFGG0VRNFQ7EK7X
+bunny db usage <database-id>
 bunny db usage --period 7d
 bunny db usage --output json
 ```
@@ -133,7 +133,7 @@ Generate a quickstart guide for connecting to a database.
 
 ```bash
 bunny db quickstart
-bunny db quickstart db_01KCHBG8C5KSFGG0VRNFQ7EK7X --lang bun
+bunny db quickstart <database-id> --lang bun
 ```
 
 #### `bunny db shell`
@@ -145,11 +145,11 @@ Open an interactive SQL shell for a database. Supports multiple output modes, se
 bunny db shell
 
 # Specify a database ID
-bunny db shell db_01KCHBG8C5KSFGG0VRNFQ7EK7X
+bunny db shell <database-id>
 
 # Execute a query and exit
 bunny db shell "SELECT * FROM users"
-bunny db shell db_01KCHBG8C5KSFGG0VRNFQ7EK7X "SELECT * FROM users"
+bunny db shell <database-id> "SELECT * FROM users"
 bunny db shell --execute "SELECT COUNT(*) FROM posts"
 
 # Output modes
@@ -204,7 +204,7 @@ Generate an auth token for a database. The database ID can be provided as a posi
 
 ```bash
 # Provide database ID explicitly
-bunny db tokens create db_01KCHBG8C5KSFGG0VRNFQ7EK7X
+bunny db tokens create <database-id>
 
 # Auto-detect from .env BUNNY_DATABASE_URL
 bunny db tokens create
@@ -227,7 +227,7 @@ bunny db tokens create --expiry 2026-12-31T23:59:59Z
 Invalidate all auth tokens for a database. Prompts for confirmation unless `--force` is passed.
 
 ```bash
-bunny db tokens invalidate db_01KCHBG8C5KSFGG0VRNFQ7EK7X
+bunny db tokens invalidate <database-id>
 bunny db tokens invalidate --force
 ```
 
@@ -265,7 +265,7 @@ Link the current directory to a remote Edge Script. Creates a `.bunny/script.jso
 bunny scripts link
 
 # Non-interactive
-bunny scripts link --id 12345
+bunny scripts link --id <script-id>
 ```
 
 #### `bunny scripts list`
@@ -283,7 +283,7 @@ bunny scripts list --output json
 Show details for an Edge Script. Uses the linked script from `.bunny/script.json` if no ID is provided.
 
 ```bash
-bunny scripts show 12345
+bunny scripts show <script-id>
 bunny scripts show
 ```
 
