@@ -19,7 +19,7 @@ import { ARG_DATABASE_ID, ENV_DATABASE_URL, ENV_DATABASE_AUTH_TOKEN } from "./co
 const COMMAND = `shell [${ARG_DATABASE_ID}] [query]`;
 const DESCRIPTION = "Open an interactive SQL shell for a database.";
 
-const ARG_EXEC = "exec";
+const ARG_EXEC = "execute";
 const ARG_EXEC_ALIAS = "e";
 const ARG_MODE = "mode";
 const ARG_MODE_ALIAS = "m";
@@ -638,7 +638,7 @@ async function resolveCredentials(
  * REPL with persistent history, dot-commands (`.tables`, `.schema`, `.dump`,
  * etc.), multiple output modes, sensitive column masking, and query timing.
  *
- * Can also run non-interactively via a positional query argument, `--exec`, or
+ * Can also run non-interactively via a positional query argument, `--execute`, or
  * by passing a `.sql` file path.
  *
  * @example
@@ -711,11 +711,11 @@ export const dbShellCommand = defineCommand<{
   handler: async ({
     [ARG_DATABASE_ID]: databaseIdArg,
     query: queryArg,
-    exec: execArg,
-    mode: modeArg,
-    unmask: unmaskArg,
-    url: urlArg,
-    token: tokenArg,
+    [ARG_EXEC]: execArg,
+    [ARG_MODE]: modeArg,
+    [ARG_UNMASK]: unmaskArg,
+    [ARG_URL]: urlArg,
+    [ARG_TOKEN]: tokenArg,
     profile,
     output,
     apiKey,
@@ -766,7 +766,7 @@ export const dbShellCommand = defineCommand<{
     if (!process.stdin.isTTY) {
       throw new UserError(
         "Interactive shell requires a TTY.",
-        "Use --exec to run a statement non-interactively.",
+        `Use --${ARG_EXEC} to run a statement non-interactively.`,
       );
     }
 

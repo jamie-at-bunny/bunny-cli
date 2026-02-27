@@ -150,7 +150,7 @@ bunny db shell db_01KCHBG8C5KSFGG0VRNFQ7EK7X
 # Execute a query and exit
 bunny db shell "SELECT * FROM users"
 bunny db shell db_01KCHBG8C5KSFGG0VRNFQ7EK7X "SELECT * FROM users"
-bunny db shell --exec "SELECT COUNT(*) FROM posts"
+bunny db shell --execute "SELECT COUNT(*) FROM posts"
 
 # Output modes
 bunny db shell -m json -e "SELECT * FROM users"
@@ -170,7 +170,7 @@ bunny db shell --url libsql://... --token ey...
 
 | Flag       | Alias | Description                                                |
 | ---------- | ----- | ---------------------------------------------------------- |
-| `--exec`   | `-e`  | Execute a SQL statement and exit                           |
+| `--execute` | `-e`  | Execute a SQL statement and exit                           |
 | `--mode`   | `-m`  | Output mode: `default`, `table`, `json`, `csv`, `markdown` |
 | `--unmask` |       | Show sensitive column values unmasked                      |
 | `--url`    |       | Database URL (skips API lookup)                            |

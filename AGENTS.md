@@ -804,7 +804,7 @@ Dot-commands that perform full table scans (`.count`, `.size`, `.dump`) warn the
 
 ### Non-interactive mode
 
-SQL can be passed as a positional argument or via `--exec`/`-e`. Smart detection: if the first positional doesn't start with `db_`, it's treated as the query rather than a database ID.
+SQL can be passed as a positional argument or via `--execute`/`-e`. Smart detection: if the first positional doesn't start with `db_`, it's treated as the query rather than a database ID.
 
 If the value ends with `.sql` and the file exists, statements are read from the file instead — split on `;` and executed sequentially. Execution stops on the first error.
 
