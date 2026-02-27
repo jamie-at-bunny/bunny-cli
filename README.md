@@ -55,10 +55,13 @@ bunny logout --force
 
 ### `bunny whoami`
 
-Show the currently authenticated account.
+Show the currently authenticated account, including your name and email.
 
 ```bash
 bunny whoami
+# Logged in as Jamie Barton (jamie@bunny.net) 🐇
+# Profile: default
+
 bunny whoami --output json
 bunny whoami --profile staging
 ```

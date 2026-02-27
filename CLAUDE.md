@@ -36,3 +36,10 @@ test("example", () => {
 - Use `logger` from `src/core/logger.ts` for all user-facing output.
 - Throw `UserError` for expected errors.
 - Database commands use v2 API endpoints (`/v2/databases/...`).
+
+## Documentation
+
+When adding, changing, or removing commands or flags, update the corresponding sections in:
+
+- `README.md` — user-facing command docs and examples.
+- `AGENTS.md` — architecture docs, command reference tree, and file listing.

@@ -4,7 +4,6 @@ import { createCoreClient } from "../api/core-client.ts";
 import { spinner } from "../core/ui.ts";
 import { logger } from "../core/logger.ts";
 import { UserError } from "../core/errors.ts";
-import { formatKeyValue } from "../core/format.ts";
 
 const COMMAND = "whoami";
 const DESCRIPTION = "Show the currently authenticated account.";
@@ -46,11 +45,7 @@ export const whoamiCommand = defineCommand({
     const spin = spinner("Verifying credentials...");
     spin.start();
 
-    logger.debug("Calling GET /apikey to verify credentials", verbose);
-
-    const { data, error } = await client.GET("/apikey", {
-      params: { query: { page: 1, perPage: 50 } },
-    });
+    const { data, error } = await client.GET("/user");
 
     spin.stop();
 
@@ -61,30 +56,22 @@ export const whoamiCommand = defineCommand({
       );
     }
 
-    logger.debug(`Found ${data.Items?.length ?? 0} API keys on account`, verbose);
+    const name = [data.FirstName, data.LastName].filter(Boolean).join(" ") || null;
+    const email = data.Email ?? null;
+    const roles = data.Roles ?? [];
 
-    const maskedKey = config.apiKey.slice(0, 8) + "..." + config.apiKey.slice(-4);
-    const source = config.profile
-      ? `config (profile: ${config.profile})`
-      : "environment variable (BUNNYNET_API_KEY)";
-
-    // Find the current key in the list to show its roles
-    const currentKey = data.Items?.find((k) => k.Key === config.apiKey);
-    const roles = currentKey?.Roles ?? [];
-
-    logger.debug(`Key matched: ${!!currentKey}`, verbose);
-    if (currentKey) {
-      logger.debug(`Key ID: ${currentKey.Id}`, verbose);
-      logger.debug(`Roles: ${roles.length > 0 ? roles.join(", ") : "(none)"}`, verbose);
-    }
+    logger.debug(`Name: ${name}`, verbose);
+    logger.debug(`Email: ${email}`, verbose);
+    logger.debug(`Roles: ${roles.length > 0 ? roles.join(", ") : "(none)"}`, verbose);
 
     if (output === "json") {
       logger.log(
         JSON.stringify(
           {
+            name,
+            email,
             profile: config.profile || null,
             source: config.profile ? "config" : "env",
-            api_key: maskedKey,
             roles,
           },
           null,
@@ -94,16 +81,17 @@ export const whoamiCommand = defineCommand({
       return;
     }
 
-    const entries = [
-      { key: "Source", value: source },
-      { key: "API key", value: maskedKey },
-    ];
-    if (roles.length > 0) {
-      entries.push({ key: "Roles", value: roles.join(", ") });
-    }
+    const maskedKey = config.apiKey.slice(0, 8) + "..." + config.apiKey.slice(-4);
+    const greeting = [name, email ? `(${email})` : null]
+      .filter(Boolean)
+      .join(" ");
 
-    logger.success("Authenticated!");
     logger.log();
-    logger.log(formatKeyValue(entries, output));
+    logger.log(`Logged in as ${greeting || maskedKey} 🐇`);
+    logger.log();
+    if (config.profile) {
+      logger.dim(`Profile: ${config.profile}`);
+    }
+    logger.dim("You can use `bunny config profile` to manage multiple accounts.");
   },
 });

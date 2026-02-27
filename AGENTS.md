@@ -122,7 +122,7 @@ bunny-cli/
 │   │   │       ├── index.ts              # defineNamespace("profile", ...) — registers create + delete
 │   │   │       ├── create.ts             # Add profile with masked API key input
 │   │   │       └── delete.ts             # Remove a profile
-│   │   ├── whoami.ts                     # Show authenticated account info (top-level: bunny whoami)
+│   │   ├── whoami.ts                     # Show authenticated account: name, email, profile (top-level: bunny whoami)
 │   │   ├── db/
 │   │   │   ├── index.ts                  # defineNamespace("db", ...) — registers all database commands
 │   │   │   ├── create.ts                 # Create a new database (interactive region selection or flags)
@@ -533,7 +533,7 @@ bun build src/index.ts --compile --target=bun-windows-x64 --outfile bunny-window
 bunny
 ├── login              [--force]            Authenticate via browser OAuth flow
 ├── logout             [--force]            Remove stored authentication profile
-├── whoami                                  Show authenticated account info
+├── whoami                                  Show authenticated account (name, email, profile)
 ├── config
 │   ├── init            [--api-key]         Initialize config (create default profile)
 │   ├── show                                Display resolved configuration
@@ -587,6 +587,16 @@ API calls use `openapi-fetch` with types generated from OpenAPI specs by `openap
 | Magic Containers         | `createMcClient()`      | `https://api.bunny.net/mc`       | Account `AccessKey` |
 
 All clients inject `AccessKey` and `User-Agent` headers via shared `authMiddleware()` in `src/api/middleware.ts`.
+
+### Undocumented endpoints (`CustomPaths`)
+
+Some Bunny API endpoints are not included in the public OpenAPI specs. These are typed manually via a `CustomPaths` type in `src/api/core-client.ts`, which is intersected with the generated `paths`:
+
+```typescript
+const client = createClient<paths & CustomPaths>({ baseUrl });
+```
+
+Only type the fields you actually use. When the endpoint is added to the spec, remove it from `CustomPaths`.
 
 ### OpenAPI specs
 
