@@ -116,12 +116,13 @@ export const authLoginCommand = defineCommand<{ force: boolean }>({
     openBrowser(authUrl);
     logger.info("Waiting for authentication...");
 
-    const timeout = new Promise<never>((_, rej) =>
-      setTimeout(
+    let timeoutId: ReturnType<typeof setTimeout>;
+    const timeout = new Promise<never>((_, rej) => {
+      timeoutId = setTimeout(
         () => rej(new Error("Authentication timed out after 5 minutes")),
         AUTH_TIMEOUT_MS,
-      ),
-    );
+      );
+    });
 
     try {
       const apiKey = await Promise.race([apiKeyPromise, timeout]);
@@ -154,6 +155,7 @@ export const authLoginCommand = defineCommand<{ force: boolean }>({
       logger.error(`Authentication failed: ${err.message}`);
       process.exit(1);
     } finally {
+      clearTimeout(timeoutId!);
       server.stop(true);
     }
   },
