@@ -6,6 +6,9 @@ import { spinner } from "../../core/ui.ts";
 import { logger } from "../../core/logger.ts";
 import { UserError } from "../../core/errors.ts";
 import { formatKeyValue } from "../../core/format.ts";
+import type { components } from "../../api/generated/database.d.ts";
+
+type PossibleRegion = components["schemas"]["PossibleRegion"];
 
 const COMMAND = "create";
 const DESCRIPTION = "Create a new database.";
@@ -103,14 +106,14 @@ export const dbCreateCommand = defineCommand<CreateArgs>({
     const availablePrimary = regionConfig.primary_regions;
     const availableReplicas = regionConfig.replica_regions;
 
-    let primaryRegions: string[];
-    let replicasRegions: string[];
+    let primaryRegions: PossibleRegion[];
+    let replicasRegions: PossibleRegion[];
 
     // Non-interactive path: flags provided
     if (args.primary) {
-      primaryRegions = args.primary.split(",").map((s) => s.trim());
+      primaryRegions = args.primary.split(",").map((s) => s.trim()) as PossibleRegion[];
       replicasRegions = args.replicas
-        ? args.replicas.split(",").map((s) => s.trim())
+        ? (args.replicas.split(",").map((s) => s.trim()) as PossibleRegion[])
         : [];
     } else {
       // Interactive path: ask about region mode
@@ -208,8 +211,8 @@ export const dbCreateCommand = defineCommand<CreateArgs>({
       body: {
         name,
         storage_region: storageRegion,
-        primary_regions: primaryRegions as any,
-        replicas_regions: replicasRegions as any,
+        primary_regions: primaryRegions,
+        replicas_regions: replicasRegions,
       },
     });
 
