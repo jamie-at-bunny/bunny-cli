@@ -1,3 +1,4 @@
+import type { components } from "../../api/generated/compute.d.ts";
 import { existsSync } from "fs";
 import { resolve, basename } from "path";
 import prompts from "prompts";
@@ -8,70 +9,92 @@ import { confirm, spinner } from "../../core/ui.ts";
 import { logger } from "../../core/logger.ts";
 import { UserError } from "../../core/errors.ts";
 import { saveManifestAt } from "../../core/manifest.ts";
-import { SCRIPT_MANIFEST } from "./constants.ts";
+import { SCRIPT_MANIFEST, TEMPLATES, type Template } from "./constants.ts";
 
-interface Template {
-  name: string;
-  description: string;
-  repo: string;
-  scriptType: number;
-}
+type EdgeScript = components["schemas"]["EdgeScriptModel"];
+type EdgeScriptTypes = components["schemas"]["EdgeScriptTypes"];
 
-const TEMPLATES: Template[] = [
-  // Standalone
-  { name: "Empty", description: "An empty Edge Script project", repo: "https://github.com/BunnyWay/es-empty-script", scriptType: 1 },
-  { name: "Return JSON", description: "A script that returns JSON responses", repo: "https://github.com/BunnyWay/es-return-json", scriptType: 1 },
-  // Middleware
-  { name: "Empty", description: "An empty Edge Script project", repo: "https://github.com/BunnyWay/es-empty-script", scriptType: 2 },
-  { name: "Simple Middleware", description: "A simple middleware example", repo: "https://github.com/BunnyWay/es-simple-middleware", scriptType: 2 },
-];
+const COMMAND = "init";
+const DESCRIPTION = "Create a new Edge Script project.";
+
+const ARG_NAME = "name";
+const ARG_NAME_DESCRIPTION = "Project directory name";
+const ARG_TYPE = "type";
+const ARG_TYPE_DESCRIPTION = "Script type";
+const ARG_TEMPLATE = "template";
+const ARG_TEMPLATE_DESCRIPTION = "Template name";
+const ARG_DEPLOY = "deploy";
+const ARG_DEPLOY_DESCRIPTION = "Deploy after creation";
+const ARG_SKIP_GIT = "skip-git";
+const ARG_SKIP_GIT_DESCRIPTION = "Skip git initialization";
+const ARG_SKIP_INSTALL = "skip-install";
+const ARG_SKIP_INSTALL_DESCRIPTION = "Skip dependency installation";
 
 interface InitArgs {
-  name?: string;
-  type?: string;
-  template?: string;
-  deploy?: boolean;
-  "skip-git"?: boolean;
-  "skip-install"?: boolean;
+  [ARG_NAME]?: string;
+  [ARG_TYPE]?: string;
+  [ARG_TEMPLATE]?: string;
+  [ARG_DEPLOY]?: boolean;
+  [ARG_SKIP_GIT]?: boolean;
+  [ARG_SKIP_INSTALL]?: boolean;
 }
 
+/**
+ * Create a new Edge Script project from a template.
+ *
+ * Walks through an interactive wizard to select a script type
+ * (standalone or middleware), clone a starter template, install
+ * dependencies, and optionally deploy the script to bunny.net.
+ *
+ * @example
+ * ```bash
+ * # Interactive wizard
+ * bunny scripts init
+ *
+ * # Non-interactive with all options
+ * bunny scripts init --name my-script --type standalone --template Empty --deploy
+ *
+ * # Skip git and dependency installation
+ * bunny scripts init --name my-script --skip-git --skip-install
+ * ```
+ */
 export const scriptsInitCommand = defineCommand<InitArgs>({
-  command: "init",
-  describe: "Create a new Edge Script project.",
+  command: COMMAND,
+  describe: DESCRIPTION,
 
   builder: (yargs) =>
     yargs
-      .option("name", {
+      .option(ARG_NAME, {
         type: "string",
-        describe: "Project directory name",
+        describe: ARG_NAME_DESCRIPTION,
       })
-      .option("type", {
+      .option(ARG_TYPE, {
         type: "string",
         choices: ["standalone", "middleware"],
-        describe: "Script type",
+        describe: ARG_TYPE_DESCRIPTION,
       })
-      .option("template", {
+      .option(ARG_TEMPLATE, {
         type: "string",
-        describe: "Template name",
+        describe: ARG_TEMPLATE_DESCRIPTION,
       })
-      .option("deploy", {
+      .option(ARG_DEPLOY, {
         type: "boolean",
-        describe: "Deploy after creation",
+        describe: ARG_DEPLOY_DESCRIPTION,
       })
-      .option("skip-git", {
+      .option(ARG_SKIP_GIT, {
         type: "boolean",
-        describe: "Skip git initialization",
+        describe: ARG_SKIP_GIT_DESCRIPTION,
       })
-      .option("skip-install", {
+      .option(ARG_SKIP_INSTALL, {
         type: "boolean",
-        describe: "Skip dependency installation",
+        describe: ARG_SKIP_INSTALL_DESCRIPTION,
       }),
 
   handler: async (args) => {
     const { profile, output, verbose, apiKey } = args;
 
     // Step 1: Directory name
-    let dirName = args.name;
+    let dirName = args[ARG_NAME];
     if (!dirName) {
       const { value } = await prompts({
         type: "text",
@@ -89,9 +112,9 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
     }
 
     // Step 2: Script type
-    let scriptType: number | undefined;
-    if (args.type) {
-      scriptType = args.type === "standalone" ? 1 : 2;
+    let scriptType: EdgeScriptTypes | undefined;
+    if (args[ARG_TYPE]) {
+      scriptType = args[ARG_TYPE] === "standalone" ? 1 : 2;
     } else {
       const { value } = await prompts({
         type: "select",
@@ -99,7 +122,10 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
         message: "Script type:",
         choices: [
           { title: "Standalone — handles requests independently", value: 1 },
-          { title: "Middleware — processes requests before/after origin", value: 2 },
+          {
+            title: "Middleware — processes requests before/after origin",
+            value: 2,
+          },
         ],
       });
       scriptType = value;
@@ -110,13 +136,13 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
     const filtered = TEMPLATES.filter((t) => t.scriptType === scriptType);
     let selected: Template | undefined;
 
-    if (args.template) {
+    if (args[ARG_TEMPLATE]) {
       selected = filtered.find(
-        (t) => t.name.toLowerCase() === args.template!.toLowerCase(),
+        (t) => t.name.toLowerCase() === args[ARG_TEMPLATE]!.toLowerCase(),
       );
       if (!selected) {
         throw new UserError(
-          `Template "${args.template}" not found.`,
+          `Template "${args[ARG_TEMPLATE]}" not found.`,
           `Available templates: ${filtered.map((t) => t.name).join(", ")}`,
         );
       }
@@ -156,7 +182,10 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
     // Remove .git so user starts fresh
     const gitDir = `${dirPath}/.git`;
     if (existsSync(gitDir)) {
-      const rm = Bun.spawn(["rm", "-rf", gitDir], { stdout: "ignore", stderr: "ignore" });
+      const rm = Bun.spawn(["rm", "-rf", gitDir], {
+        stdout: "ignore",
+        stderr: "ignore",
+      });
       await rm.exited;
     }
 
@@ -164,7 +193,10 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
     logger.success(`Created project from "${selected.name}" template.`);
 
     // Step 5: Install dependencies
-    if (existsSync(`${dirPath}/package.json`) && args["skip-install"] !== true) {
+    if (
+      existsSync(`${dirPath}/package.json`) &&
+      args[ARG_SKIP_INSTALL] !== true
+    ) {
       const shouldInstall = await confirm("Install dependencies?");
       if (shouldInstall) {
         const installSpin = spinner("Installing dependencies...");
@@ -181,7 +213,9 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
         if (installExit === 0) {
           logger.success("Dependencies installed.");
         } else {
-          logger.warn("Failed to install dependencies. Run `bun install` manually.");
+          logger.warn(
+            "Failed to install dependencies. Run `bun install` manually.",
+          );
         }
       }
     }
@@ -190,7 +224,7 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
     saveManifestAt(dirPath, SCRIPT_MANIFEST, { scriptType });
 
     // Step 7: Git init
-    if (args["skip-git"] !== true) {
+    if (args[ARG_SKIP_GIT] !== true) {
       const shouldGit = await confirm("Initialize git repository?");
       if (shouldGit) {
         const gitInit = Bun.spawn(["git", "init"], {
@@ -209,7 +243,9 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
         if (!existing.includes(".bunny")) {
           await Bun.write(
             gitignorePath,
-            existing + (existing.endsWith("\n") || existing === "" ? "" : "\n") + ".bunny/\n",
+            existing +
+              (existing.endsWith("\n") || existing === "" ? "" : "\n") +
+              ".bunny/\n",
           );
         }
 
@@ -218,11 +254,14 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
     }
 
     // Step 8: Deploy (create script on bunny.net + link)
-    let deployResult: { id: number; name: string; hostname?: string } | undefined;
+    let deployResult:
+      | (Pick<EdgeScript, "Id" | "Name"> & { hostname?: string })
+      | undefined;
 
-    const shouldDeploy = args.deploy !== undefined
-      ? args.deploy
-      : await confirm("Deploy script now?");
+    const shouldDeploy =
+      args[ARG_DEPLOY] !== undefined
+        ? args[ARG_DEPLOY]
+        : await confirm("Deploy script now?");
 
     if (shouldDeploy) {
       const config = resolveConfig(profile, apiKey);
@@ -235,7 +274,7 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
       const { data: script } = await client.POST("/compute/script", {
         body: {
           Name: scriptName,
-          ScriptType: scriptType as 0 | 1 | 2,
+          ScriptType: scriptType,
           CreateLinkedPullZone: true,
         },
       });
@@ -255,8 +294,8 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
         });
 
         deployResult = {
-          id: script.Id!,
-          name: script.Name!,
+          Id: script.Id,
+          Name: script.Name,
           hostname: script.LinkedPullZones?.[0]?.DefaultHostname ?? undefined,
         };
 
@@ -271,12 +310,24 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
     logger.dim(`  cd ${dirName}`);
 
     if (output === "json") {
-      logger.log(JSON.stringify({
-        directory: dirName,
-        scriptType,
-        template: selected.name,
-        ...(deployResult && { script: deployResult }),
-      }, null, 2));
+      logger.log(
+        JSON.stringify(
+          {
+            directory: dirName,
+            scriptType,
+            template: selected.name,
+            ...(deployResult && {
+              script: {
+                id: deployResult.Id,
+                name: deployResult.Name,
+                hostname: deployResult.hostname,
+              },
+            }),
+          },
+          null,
+          2,
+        ),
+      );
     }
   },
 });

@@ -8,5 +8,11 @@ import { scriptsShowCommand } from "./show.ts";
 export const scriptsNamespace = defineNamespace(
   "scripts",
   "Manage Edge Scripts.",
-  [scriptsDocsCommand, scriptsInitCommand, scriptsLinkCommand, scriptsListCommand, scriptsShowCommand],
+  [
+    scriptsDocsCommand,
+    scriptsInitCommand,
+    scriptsLinkCommand,
+    scriptsListCommand,
+    scriptsShowCommand,
+  ],
 );

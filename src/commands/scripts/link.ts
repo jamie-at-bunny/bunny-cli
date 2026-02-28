@@ -1,3 +1,4 @@
+import type { components } from "../../api/generated/compute.d.ts";
 import prompts from "prompts";
 import { defineCommand } from "../../core/define-command.ts";
 import { resolveConfig } from "../../config/index.ts";
@@ -8,17 +9,51 @@ import { saveManifest } from "../../core/manifest.ts";
 import { UserError } from "../../core/errors.ts";
 import { SCRIPT_MANIFEST } from "./constants.ts";
 
-export const scriptsLinkCommand = defineCommand<{ id?: number }>({
-  command: "link",
-  describe: "Link the current directory to an Edge Script.",
+type EdgeScript = components["schemas"]["EdgeScriptModel"];
+
+const COMMAND = "link";
+const DESCRIPTION = "Link the current directory to an Edge Script.";
+
+const ARG_ID = "id";
+const ARG_ID_DESCRIPTION = "Edge Script ID (skips interactive prompt)";
+
+interface LinkArgs {
+  [ARG_ID]?: EdgeScript["Id"];
+}
+
+/**
+ * Link the current directory to an Edge Script.
+ *
+ * Saves the script ID and metadata into a local `.bunny/script.json`
+ * manifest so subsequent commands (e.g. `scripts show`) can resolve
+ * the script automatically.
+ *
+ * When `--id` is provided the script is fetched and linked immediately;
+ * otherwise an interactive prompt lists all available scripts.
+ *
+ * @example
+ * ```bash
+ * # Interactive selection
+ * bunny scripts link
+ *
+ * # Direct link by ID
+ * bunny scripts link --id 12345
+ *
+ * # JSON output
+ * bunny scripts link --id 12345 --output json
+ * ```
+ */
+export const scriptsLinkCommand = defineCommand<LinkArgs>({
+  command: COMMAND,
+  describe: DESCRIPTION,
 
   builder: (yargs) =>
-    yargs.option("id", {
+    yargs.option(ARG_ID, {
       type: "number",
-      describe: "Edge Script ID (skips interactive prompt)",
+      describe: ARG_ID_DESCRIPTION,
     }),
 
-  handler: async ({ id, profile, output, verbose, apiKey }) => {
+  handler: async ({ [ARG_ID]: id, profile, output, verbose, apiKey }) => {
     const config = resolveConfig(profile, apiKey);
     const client = createComputeClient(config.apiKey, config.apiUrl, verbose);
 

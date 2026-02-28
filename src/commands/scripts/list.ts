@@ -6,10 +6,30 @@ import { logger } from "../../core/logger.ts";
 import { formatTable } from "../../core/format.ts";
 import { SCRIPT_TYPE_LABELS } from "./constants.ts";
 
+const COMMAND = "list";
+const DESCRIPTION = "List all Edge Scripts.";
+
+/**
+ * List all Edge Scripts in the account.
+ *
+ * Fetches standalone and middleware scripts (excludes DNS scripts) and
+ * displays them in a table with linked pull zone information.
+ *
+ * @example
+ * ```bash
+ * bunny scripts list
+ *
+ * # Short alias
+ * bunny scripts ls
+ *
+ * # JSON output
+ * bunny scripts list --output json
+ * ```
+ */
 export const scriptsListCommand = defineCommand({
-  command: "list",
+  command: COMMAND,
   aliases: ["ls"],
-  describe: "List all Edge Scripts.",
+  describe: DESCRIPTION,
 
   handler: async ({ profile, output, verbose, apiKey }) => {
     const config = resolveConfig(profile, apiKey);
