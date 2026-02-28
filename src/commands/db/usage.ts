@@ -6,7 +6,7 @@ import { resolveDbId } from "./resolve-db.ts";
 import { spinner } from "../../core/ui.ts";
 import { logger } from "../../core/logger.ts";
 import { UserError } from "../../core/errors.ts";
-import { formatKeyValue } from "../../core/format.ts";
+import { formatDate, formatKeyValue } from "../../core/format.ts";
 import { ARG_DATABASE_ID } from "./constants.ts";
 
 const COMMAND = `usage [${ARG_DATABASE_ID}]`;
@@ -73,14 +73,6 @@ function formatNumber(n: number): string {
   return n.toLocaleString();
 }
 
-/** Format a date for display (e.g. "Feb 1, 2026"). */
-function formatDate(date: Date): string {
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
 
 interface UsageArgs {
   [ARG_DATABASE_ID]?: string;

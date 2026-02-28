@@ -32,7 +32,7 @@ function manifestPath(filename: string): string {
   return join(findRoot(filename), MANIFEST_DIR, filename);
 }
 
-function manifestDir(filename: string): string {
+export function manifestDir(filename: string): string {
   return join(findRoot(filename), MANIFEST_DIR);
 }
 

@@ -2,6 +2,43 @@ import chalk from "chalk";
 import Table from "cli-table3";
 import type { OutputFormat } from "./types.ts";
 
+/** Resolve a date-like value to a `Date`, or `null` if invalid/missing. */
+function toDate(value: Date | string | null | undefined): Date | null {
+  if (!value) return null;
+  const d = value instanceof Date ? value : new Date(value);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+/** Format a date for display (e.g. "Feb 1, 2026"). Returns "—" for invalid/missing values. */
+export function formatDate(value: Date | string | null | undefined): string {
+  const d = toDate(value);
+  if (!d) return "—";
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+/** Format a date with time for display (e.g. "Feb 28, 2026 15:04"). Returns "—" for invalid/missing values. */
+export function formatDateTime(value: Date | string | null | undefined): string {
+  const d = toDate(value);
+  if (!d) return "—";
+  return (
+    d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    }) +
+    " " +
+    d.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    })
+  );
+}
+
 /** Escape a value for CSV output. */
 export function csvEscape(value: string): string {
   if (value.includes(",") || value.includes('"') || value.includes("\n")) {
