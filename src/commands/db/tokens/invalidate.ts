@@ -77,18 +77,14 @@ export const dbTokensInvalidateCommand = defineCommand<{
     force,
     profile,
     output,
+    verbose,
     apiKey,
   }) => {
     const config = resolveConfig(profile, apiKey);
-    const client = createDbClient(config.apiKey);
+    const client = createDbClient(config.apiKey, undefined, verbose);
 
-    // Resolve the target database — explicit ID or auto-detected from .env
-    const spin = spinner("Resolving database...");
-    spin.start();
-
+    // Resolve the target database — explicit ID, .env, or interactive prompt
     const { id: databaseId, source } = await resolveDbId(client, databaseIdArg);
-
-    spin.stop();
 
     if (source === "env") {
       logger.dim(`Database: ${databaseId} (from .env)`);

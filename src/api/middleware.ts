@@ -1,6 +1,7 @@
 import type { Middleware } from "openapi-fetch";
 import { VERSION } from "../core/version.ts";
 import { ApiError } from "../core/errors.ts";
+import { logger } from "../core/logger.ts";
 
 const STATUS_MESSAGES: Record<number, string> = {
   401: "Unauthorized. Check your API key.",
@@ -42,14 +43,35 @@ const extractors: Array<(body: any) => { message: string; field?: string; valida
  * Command handlers never need to check `response.ok` or parse error bodies —
  * a failed request throws before it reaches handler code.
  */
-export function authMiddleware(apiKey: string): Middleware {
+export function authMiddleware(apiKey: string, verbose = false): Middleware {
   return {
     async onRequest({ request }) {
       request.headers.set("AccessKey", apiKey);
       request.headers.set("User-Agent", `bunny-cli/${VERSION}`);
+
+      if (verbose) {
+        logger.debug(`→ ${request.method} ${request.url}`, true);
+        if (request.body) {
+          const cloned = request.clone();
+          try {
+            const body = await cloned.json();
+            logger.debug(`→ Body: ${JSON.stringify(body, null, 2)}`, true);
+          } catch {}
+        }
+      }
+
       return request;
     },
     async onResponse({ response }) {
+      if (verbose) {
+        const cloned = response.clone();
+        logger.debug(`← ${response.status} ${response.statusText}`, true);
+        try {
+          const body = await cloned.json();
+          logger.debug(`← Body: ${JSON.stringify(body, null, 2)}`, true);
+        } catch {}
+      }
+
       if (response.ok) return;
 
       let body: any = null;

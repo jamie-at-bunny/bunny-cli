@@ -11,9 +11,9 @@ export const scriptsListCommand = defineCommand({
   aliases: ["ls"],
   describe: "List all Edge Scripts.",
 
-  handler: async ({ profile, output, apiKey }) => {
+  handler: async ({ profile, output, verbose, apiKey }) => {
     const config = resolveConfig(profile, apiKey);
-    const client = createComputeClient(config.apiKey, config.apiUrl);
+    const client = createComputeClient(config.apiKey, config.apiUrl, verbose);
 
     const spin = spinner("Fetching Edge Scripts...");
     spin.start();

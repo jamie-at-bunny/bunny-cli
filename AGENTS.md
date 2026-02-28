@@ -128,7 +128,7 @@ bunny-cli/
 │   │   │   ├── create.ts                 # Create a new database (interactive region selection or flags)
 │   │   │   ├── list.ts                   # List all databases
 │   │   │   ├── quickstart.ts             # Generate quickstart guide for connecting to a database
-│   │   │   ├── resolve-db.ts             # Helper: resolve database ID from flag or .env BUNNY_DATABASE_URL
+│   │   │   ├── resolve-db.ts             # Helper: resolve database ID from flag, .env, or interactive prompt
 │   │   │   ├── shell.ts                 # Interactive SQL shell (REPL, dot-commands, masking, history)
 │   │   │   ├── shell.test.ts            # Tests for shell utilities (formatting, masking, history)
 │   │   │   ├── usage.ts                  # Show database usage statistics
@@ -598,6 +598,20 @@ const client = createClient<paths & CustomPaths>({ baseUrl });
 
 Only type the fields you actually use. When the endpoint is added to the spec, remove it from `CustomPaths`.
 
+### Type conventions
+
+Prefer generated schema types over inline primitives. When you need a subset of fields from a generated type, use `Pick<>`:
+
+```typescript
+// Good — derived from generated schema
+type Database = Pick<components["schemas"]["Database2"], "id" | "name" | "url">;
+
+// Bad — inline primitives that duplicate the schema
+type Database = { id: string; name: string; url: string };
+```
+
+Only fall back to `string`, `any`, or `number` when no generated type exists (e.g. `CustomPaths` for undocumented endpoints).
+
 ### OpenAPI specs
 
 Specs are committed as JSON files in `specs/`. Generated types go to `src/api/generated/` (gitignored).
@@ -752,7 +766,8 @@ Database token commands (`db tokens create`, `db tokens invalidate`) can auto-re
 
 1. Explicit positional argument — `bunny db tokens create db_01KCHBG8...`
 2. `BUNNY_DATABASE_URL` in `.env` — walks up the directory tree, parses the URL, matches it against the database list via API
-3. Error with hint
+3. Interactive prompt — fetches all databases and presents a select menu
+4. If no databases exist — `UserError` with hint to run `bunny db create`
 
 The URL (e.g. `libsql://...bunnydb.net/`) does not directly contain the `db_id`. The resolver fetches the database list and matches by URL to find the corresponding `db_id`.
 

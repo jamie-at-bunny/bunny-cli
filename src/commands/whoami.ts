@@ -40,7 +40,7 @@ export const whoamiCommand = defineCommand({
     logger.debug(`Profile: ${config.profile || "(none)"}`, verbose);
     logger.debug(`API URL: ${config.apiUrl}`, verbose);
 
-    const client = createCoreClient(config.apiKey, config.apiUrl);
+    const client = createCoreClient(config.apiKey, config.apiUrl, verbose);
 
     const spin = spinner("Verifying credentials...");
     spin.start();

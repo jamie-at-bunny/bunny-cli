@@ -68,7 +68,7 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
       }),
 
   handler: async (args) => {
-    const { profile, output, apiKey } = args;
+    const { profile, output, verbose, apiKey } = args;
 
     // Step 1: Directory name
     let dirName = args.name;
@@ -226,7 +226,7 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
 
     if (shouldDeploy) {
       const config = resolveConfig(profile, apiKey);
-      const client = createComputeClient(config.apiKey, config.apiUrl);
+      const client = createComputeClient(config.apiKey, config.apiUrl, verbose);
       const scriptName = basename(dirPath);
 
       const createSpin = spinner(`Creating script "${scriptName}"...`);

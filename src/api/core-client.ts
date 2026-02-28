@@ -26,8 +26,8 @@ type CustomPaths = {
 };
 
 /** Create a type-safe client for the Bunny Core API (CDN, DNS, storage zones, billing). */
-export function createCoreClient(apiKey: string, baseUrl: string) {
+export function createCoreClient(apiKey: string, baseUrl: string, verbose = false) {
   const client = createClient<paths & CustomPaths>({ baseUrl });
-  client.use(authMiddleware(apiKey));
+  client.use(authMiddleware(apiKey, verbose));
   return client;
 }

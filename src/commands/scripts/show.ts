@@ -17,10 +17,10 @@ export const scriptsShowCommand = defineCommand<{ id?: number }>({
       describe: "Edge Script ID (uses linked script if omitted)",
     }),
 
-  handler: async ({ id: rawId, profile, output, apiKey }) => {
+  handler: async ({ id: rawId, profile, output, verbose, apiKey }) => {
     const id = resolveManifestId(SCRIPT_MANIFEST, rawId, "script");
     const config = resolveConfig(profile, apiKey);
-    const client = createComputeClient(config.apiKey, config.apiUrl);
+    const client = createComputeClient(config.apiKey, config.apiUrl, verbose);
 
     const spin = spinner("Fetching Edge Script...");
     spin.start();

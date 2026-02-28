@@ -127,24 +127,23 @@ export const dbTokensCreateCommand = defineCommand<{
     force,
     profile,
     output,
+    verbose,
     apiKey,
   }) => {
     const config = resolveConfig(profile, apiKey);
-    const client = createDbClient(config.apiKey);
+    const client = createDbClient(config.apiKey, undefined, verbose);
 
     const authorization = readOnly ? "read-only" : "full-access";
     const expiresAt = expiry ? parseExpiry(expiry) : null;
 
-    const spin = spinner("Resolving database...");
-    spin.start();
-
     const { id: databaseId, source } = await resolveDbId(client, databaseIdArg);
 
     if (source === "env") {
-      spin.text = `Found database ${databaseId} from .env`;
+      logger.dim(`Database: ${databaseId} (from .env)`);
     }
 
-    spin.text = "Generating token...";
+    const spin = spinner("Generating token...");
+    spin.start();
 
     // Fetch token and database details in parallel
     const [tokenResult, dbResult] = await Promise.all([

@@ -69,9 +69,9 @@ export const dbCreateCommand = defineCommand<CreateArgs>({
       }),
 
   handler: async (args) => {
-    const { profile, output, apiKey } = args;
+    const { profile, output, verbose, apiKey } = args;
     const config = resolveConfig(profile, apiKey);
-    const client = createDbClient(config.apiKey);
+    const client = createDbClient(config.apiKey, undefined, verbose);
 
     // Step 1: Database name
     let name = args.name;

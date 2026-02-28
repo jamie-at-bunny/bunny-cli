@@ -32,9 +32,9 @@ export const dbListCommand = defineCommand({
   aliases: ALIASES,
   describe: DESCRIPTION,
 
-  handler: async ({ profile, output, apiKey }) => {
+  handler: async ({ profile, output, verbose, apiKey }) => {
     const config = resolveConfig(profile, apiKey);
-    const client = createDbClient(config.apiKey);
+    const client = createDbClient(config.apiKey, undefined, verbose);
 
     const spin = spinner("Fetching databases...");
     spin.start();

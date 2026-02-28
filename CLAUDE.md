@@ -36,6 +36,7 @@ test("example", () => {
 - Use `logger` from `src/core/logger.ts` for all user-facing output.
 - Throw `UserError` for expected errors.
 - Database commands use v2 API endpoints (`/v2/databases/...`).
+- Prefer generated schema types over inline primitives. Use `Pick<components["schemas"]["TypeName"], "field1" | "field2">` instead of `{ field1: string; field2: number }`. Only fall back to `string`, `any`, or `number` when no generated type exists.
 
 ## Documentation
 

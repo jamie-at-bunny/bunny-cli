@@ -18,9 +18,9 @@ export const scriptsLinkCommand = defineCommand<{ id?: number }>({
       describe: "Edge Script ID (skips interactive prompt)",
     }),
 
-  handler: async ({ id, profile, output, apiKey }) => {
+  handler: async ({ id, profile, output, verbose, apiKey }) => {
     const config = resolveConfig(profile, apiKey);
-    const client = createComputeClient(config.apiKey, config.apiUrl);
+    const client = createComputeClient(config.apiKey, config.apiUrl, verbose);
 
     if (id) {
       const spin = spinner("Fetching Edge Script...");

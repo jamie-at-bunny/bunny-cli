@@ -146,10 +146,11 @@ export const dbUsageCommand = defineCommand<UsageArgs>({
     period,
     profile,
     output,
+    verbose,
     apiKey,
   }) => {
     const config = resolveConfig(profile, apiKey);
-    const client = createDbClient(config.apiKey);
+    const client = createDbClient(config.apiKey, undefined, verbose);
 
     // Resolve time range
     const now = new Date();
@@ -170,13 +171,11 @@ export const dbUsageCommand = defineCommand<UsageArgs>({
       toDate = now;
     }
 
-    const spin = spinner("Resolving database...");
-    spin.start();
-
     const { id: databaseId, source } = await resolveDbId(client, databaseIdArg);
 
     // Fetch statistics and database details in parallel
-    spin.text = "Fetching usage data...";
+    const spin = spinner("Fetching usage data...");
+    spin.start();
 
     const [statsResult, dbResult] = await Promise.all([
       client.GET("/v2/databases/{db_id}/statistics", {

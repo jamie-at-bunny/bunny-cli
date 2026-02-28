@@ -5,8 +5,8 @@ import { authMiddleware } from "./middleware.ts";
 const MC_BASE_URL = "https://api.bunny.net/mc";
 
 /** Create a type-safe client for the Bunny Magic Containers API. */
-export function createMcClient(apiKey: string, baseUrl = MC_BASE_URL) {
+export function createMcClient(apiKey: string, baseUrl = MC_BASE_URL, verbose = false) {
   const client = createClient<paths>({ baseUrl });
-  client.use(authMiddleware(apiKey));
+  client.use(authMiddleware(apiKey, verbose));
   return client;
 }

@@ -188,6 +188,7 @@ export const dbQuickstartCommand = defineCommand<{
     token: tokenArg,
     profile,
     output,
+    verbose,
     apiKey,
   }) => {
     // Language selection
@@ -215,14 +216,12 @@ export const dbQuickstartCommand = defineCommand<{
     // Resolve URL and token from API if not provided via flags
     if (!url || !token) {
       const config = resolveConfig(profile, apiKey);
-      const client = createDbClient(config.apiKey);
-
-      const spin = spinner("Resolving database...");
-      spin.start();
+      const client = createDbClient(config.apiKey, undefined, verbose);
 
       const { id: databaseId } = await resolveDbId(client, databaseIdArg);
 
-      spin.text = "Fetching database details...";
+      const spin = spinner("Fetching database details...");
+      spin.start();
 
       const fetches: Promise<any>[] = [
         client.GET("/v2/databases/{db_id}", {

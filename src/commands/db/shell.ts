@@ -581,6 +581,7 @@ async function resolveCredentials(
   databaseIdArg: string | undefined,
   profile: string,
   apiKeyOverride?: string,
+  verbose = false,
 ): Promise<{ url: string; token: string }> {
   let url = urlArg ?? readEnvValue(ENV_DATABASE_URL)?.value;
   let token = tokenArg ?? readEnvValue(ENV_DATABASE_AUTH_TOKEN)?.value;
@@ -588,12 +589,12 @@ async function resolveCredentials(
   if (url && token) return { url, token };
 
   const config = resolveConfig(profile, apiKeyOverride);
-  const apiClient = createDbClient(config.apiKey);
-
-  const spin = spinner("Resolving database...");
-  spin.start();
+  const apiClient = createDbClient(config.apiKey, undefined, verbose);
 
   const { id: databaseId } = await resolveDbId(apiClient, databaseIdArg);
+
+  const spin = spinner("Connecting...");
+  spin.start();
 
   const fetches: Promise<any>[] = [];
 
@@ -718,6 +719,7 @@ export const dbShellCommand = defineCommand<{
     [ARG_TOKEN]: tokenArg,
     profile,
     output,
+    verbose,
     apiKey,
   }) => {
     // If database-id doesn't look like a database ID, treat it as the query
@@ -743,6 +745,7 @@ export const dbShellCommand = defineCommand<{
       databaseId,
       profile,
       apiKey,
+      verbose,
     );
 
     const client = createClient({ url, authToken: token });
