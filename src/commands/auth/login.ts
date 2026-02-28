@@ -1,10 +1,16 @@
 import { randomBytes } from "crypto";
 import { defineCommand } from "../../core/define-command.ts";
-import { profileExists, setProfile } from "../../config/index.ts";
-import { confirm, openBrowser } from "../../core/ui.ts";
+import {
+  profileExists,
+  setProfile,
+  resolveConfig,
+} from "../../config/index.ts";
+import { createCoreClient } from "../../api/core-client.ts";
+import { confirm, openBrowser, spinner } from "../../core/ui.ts";
 import { logger } from "../../core/logger.ts";
 
-const DASHBOARD_URL = process.env.BUNNYNET_DASHBOARD_URL ?? "https://dash.bunny.net";
+const DASHBOARD_URL =
+  process.env.BUNNYNET_DASHBOARD_URL ?? "https://dash.bunny.net";
 const AUTH_TIMEOUT_MS = 5 * 60 * 1000;
 
 const SUCCESS_HTML = `<!doctype html>
@@ -50,9 +56,11 @@ export const authLoginCommand = defineCommand<{ force: boolean }>({
       describe: "Overwrite existing profile without confirmation",
     }),
 
-  handler: async ({ profile, force }) => {
+  handler: async ({ profile, force, verbose }) => {
     if (profileExists(profile)) {
-      logger.warn(`Profile "${profile}" already exists and will be overwritten.`);
+      logger.warn(
+        `Profile "${profile}" already exists and will be overwritten.`,
+      );
       const ok = await confirm("Continue?", { force });
       if (!ok) {
         logger.log("Login cancelled.");
@@ -62,7 +70,11 @@ export const authLoginCommand = defineCommand<{ force: boolean }>({
 
     const state = randomBytes(16).toString("hex");
 
-    const { promise: apiKeyPromise, resolve, reject } = Promise.withResolvers<string>();
+    const {
+      promise: apiKeyPromise,
+      resolve,
+      reject,
+    } = Promise.withResolvers<string>();
 
     const server = Bun.serve({
       port: 0,
@@ -105,20 +117,44 @@ export const authLoginCommand = defineCommand<{ force: boolean }>({
     logger.info("Waiting for authentication...");
 
     const timeout = new Promise<never>((_, rej) =>
-      setTimeout(() => rej(new Error("Authentication timed out after 5 minutes")), AUTH_TIMEOUT_MS),
+      setTimeout(
+        () => rej(new Error("Authentication timed out after 5 minutes")),
+        AUTH_TIMEOUT_MS,
+      ),
     );
 
     try {
       const apiKey = await Promise.race([apiKeyPromise, timeout]);
       setProfile(profile, apiKey);
+
+      // Fetch user details for a personalised greeting
+      const config = resolveConfig(profile);
+      const client = createCoreClient(config.apiKey, config.apiUrl, verbose);
+
+      const spin = spinner("Verifying credentials...");
+      spin.start();
+      const { data } = await client.GET("/user");
+      spin.stop();
+
+      const name = data
+        ? [data.FirstName, data.LastName].filter(Boolean).join(" ")
+        : null;
+
       logger.log();
-      logger.success(`Authenticated successfully! Profile "${profile}" saved.`);
+      logger.success(
+        name
+          ? `Welcome, ${name}! 🐰`
+          : `Authenticated! Profile "${profile}" saved. 🐇`,
+      );
+      logger.log();
+      logger.dim(
+        "You can now use the CLI to manage edge scripts, databases, apps, and storage.",
+      );
     } catch (err: any) {
       logger.error(`Authentication failed: ${err.message}`);
       process.exit(1);
     } finally {
-      server.stop();
+      server.stop(true);
     }
   },
 });
-
