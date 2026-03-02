@@ -53,9 +53,8 @@ export const BunnyAppConfigSchema = z.object({
         required: z.array(z.string()).optional(),
       })
       .optional(),
-    container: ContainerConfigSchema,
+    containers: z.record(z.string(), ContainerConfigSchema),
   }),
-  accessories: z.record(z.string(), ContainerConfigSchema).optional(),
 });
 
 // ─── Inferred types ──────────────────────────────────────────────────

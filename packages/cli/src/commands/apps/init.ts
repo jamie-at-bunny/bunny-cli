@@ -145,7 +145,7 @@ export const appsInitCommand = defineCommand<InitArgs>({
           allowed: selectedRegions,
           required: [selectedRegions[0]!],
         },
-        container,
+        containers: { [name]: container },
       },
     };
 

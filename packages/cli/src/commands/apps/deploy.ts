@@ -17,6 +17,7 @@ import {
   saveConfig,
   parseImageRef,
   configToAddRequest,
+  configToPatchRequest,
 } from "./config.ts";
 
 const COMMAND = "deploy";
@@ -44,9 +45,13 @@ export const appsDeployCommand = defineCommand<DeployArgs>({
     let appId = toml.app.id;
     let deployImage = image;
 
+    // Get the primary (first) container from the containers map
+    const containerEntries = Object.entries(toml.app.containers);
+    const primaryContainer = containerEntries[0]?.[1];
+
     // Build from Dockerfile if configured and no --image override
-    const { dockerfile } = toml.app.container;
-    let registry = toml.app.container.registry;
+    const dockerfile = primaryContainer?.dockerfile;
+    let registry = primaryContainer?.registry;
 
     if (dockerfile && !image) {
       await ensureDockerAvailable();
@@ -58,7 +63,9 @@ export const appsDeployCommand = defineCommand<DeployArgs>({
           throw new UserError("A registry is required to build and push images.");
         }
         registry = registryId;
-        toml.app.container.registry = registry;
+        if (primaryContainer) {
+          primaryContainer.registry = registry;
+        }
         saveConfig(toml);
       }
 
@@ -75,7 +82,7 @@ export const appsDeployCommand = defineCommand<DeployArgs>({
       if (!reg?.hostName) {
         throw new UserError(
           `Registry ${registry} not found or has no hostname.`,
-          "Use `bunny apps registry list` to check your registries.",
+          "Use `bunny registry list` to check your registries.",
         );
       }
 
@@ -111,6 +118,26 @@ export const appsDeployCommand = defineCommand<DeployArgs>({
       saveConfig(toml);
 
       logger.success(`App "${toml.app.name}" created (${appId}).`);
+    } else {
+      // Existing app — push config changes before deploying
+      const pushSpin = spinner("Pushing config...");
+      pushSpin.start();
+
+      const { data: existingApp } = await client.GET("/apps/{appId}", {
+        params: { path: { appId } },
+      });
+
+      if (!existingApp) {
+        pushSpin.stop();
+        throw new UserError(`App ${appId} not found.`);
+      }
+
+      await client.PATCH("/apps/{appId}", {
+        params: { path: { appId } },
+        body: configToPatchRequest(toml, existingApp),
+      });
+
+      pushSpin.stop();
     }
 
     // If we have an image to deploy (from build or --image), update the primary container

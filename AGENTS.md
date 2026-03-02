@@ -171,12 +171,6 @@ bunny-cli/
 │           │   │   ├── delete.ts         # Delete app
 │           │   │   ├── pull.ts           # Sync API → bunny.jsonc
 │           │   │   ├── push.ts           # Sync bunny.jsonc → API
-│           │   │   ├── accessory/
-│           │   │   │   ├── index.ts      # defineNamespace("accessory", ...)
-│           │   │   │   ├── list.ts       # List accessory containers
-│           │   │   │   ├── start.ts      # Add container from bunny.jsonc + deploy
-│           │   │   │   ├── stop.ts       # Remove container template
-│           │   │   │   └── restart.ts    # Restart all containers
 │           │   │   ├── env/
 │           │   │   │   ├── index.ts      # defineNamespace("env", ...)
 │           │   │   │   ├── list.ts       # List env vars per container
@@ -192,15 +186,10 @@ bunny-cli/
 │           │   │   │   ├── index.ts      # defineNamespace("volumes", ...)
 │           │   │   │   ├── list.ts       # List volumes
 │           │   │   │   └── remove.ts     # Remove volume
-│           │   │   ├── regions/
-│           │   │   │   ├── index.ts      # defineNamespace("regions", ...)
-│           │   │   │   ├── list.ts       # List available regions
-│           │   │   │   └── show.ts       # Show app region settings
-│           │   │   └── registry/
-│           │   │       ├── index.ts      # defineNamespace("registry", ...)
-│           │   │       ├── list.ts       # List container registries
-│           │   │       ├── add.ts        # Add registry with credentials
-│           │   │       └── remove.ts     # Remove registry
+│           │   │   └── regions/
+│           │   │       ├── index.ts      # defineNamespace("regions", ...)
+│           │   │       ├── list.ts       # List available regions
+│           │   │       └── show.ts       # Show app region settings
 │           │   ├── auth/
 │           │   │   ├── login.ts          # Browser-based OAuth login via Bun.serve() callback (top-level: bunny login)
 │           │   │   └── logout.ts         # Profile removal with --force confirmation bypass (top-level: bunny logout)
@@ -225,6 +214,11 @@ bunny-cli/
 │           │   │       ├── index.ts      # defineNamespace("tokens", ...) — registers token commands
 │           │   │       ├── create.ts     # Generate an auth token (read-only/full-access, optional expiry)
 │           │   │       └── invalidate.ts # Invalidate all tokens for a database (with confirmation)
+│           │   ├── registry/
+│           │   │   ├── index.ts          # defineNamespace("registry", ...) — top-level: bunny registry
+│           │   │   ├── list.ts           # List container registries
+│           │   │   ├── add.ts            # Add registry with credentials
+│           │   │   └── remove.ts         # Remove registry
 │           │   └── scripts/
 │           │       ├── index.ts          # defineNamespace("scripts", ...) — registers all script commands
 │           │       ├── constants.ts      # SCRIPT_MANIFEST, SCRIPT_TYPE_LABELS
@@ -645,11 +639,6 @@ bunny
 │   ├── delete          [--id] [--force]    Delete an app
 │   ├── pull            [--id] [--force]    Sync remote config to bunny.jsonc
 │   ├── push            [--id] [--dry-run]  Apply bunny.jsonc to remote
-│   ├── accessory
-│   │   ├── list        [--id]              List accessory containers
-│   │   ├── start       <name|all> [--id]   Start accessory from bunny.jsonc
-│   │   ├── stop        <name|all> [--force] Stop accessory container
-│   │   └── restart     [name] [--id]       Restart containers
 │   ├── env
 │   │   ├── list        [--container]       List environment variables
 │   │   ├── set         <key> <value> [--container]  Set environment variable
@@ -662,13 +651,13 @@ bunny
 │   ├── volumes
 │   │   ├── list                            List volumes
 │   │   └── remove      <id> [--force]      Remove volume
-│   ├── regions
-│   │   ├── list        (alias: ls)         List available regions
-│   │   └── show        [id]                Show app region settings
-│   └── registry
-│       ├── list        (alias: ls)         List container registries
-│       ├── add         [--name] [--username] Add registry
-│       └── remove      <id>                Remove registry
+│   └── regions
+│       ├── list        (alias: ls)         List available regions
+│       └── show        [id]                Show app region settings
+├── registry
+│   ├── list            (alias: ls)         List container registries
+│   ├── add             [--name] [--username]  Add registry
+│   └── remove          <id>                Remove registry
 ├── db
 │   ├── create          [--name] [--primary] [--replicas] [--storage-region]
 │   │                                       Create a new database
@@ -939,7 +928,9 @@ The `.bunny/` manifest and `bunny.jsonc` serve different purposes:
   "$schema": "./node_modules/@bunny.net/app-config/generated/schema.json",
   "app": {
     "name": "my-app",
-    "container": { "image": "nginx:latest" }
+    "containers": {
+      "web": { "image": "nginx:latest" }
+    }
   }
 }
 ```

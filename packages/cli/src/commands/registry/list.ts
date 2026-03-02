@@ -1,15 +1,15 @@
 import { createMcClient } from "@bunny.net/api";
-import { resolveConfig } from "../../../config/index.ts";
-import { defineCommand } from "../../../core/define-command.ts";
-import { formatTable } from "../../../core/format.ts";
-import { logger } from "../../../core/logger.ts";
-import { spinner } from "../../../core/ui.ts";
-import { clientOptions } from "../../../core/client-options.ts";
+import { resolveConfig } from "../../config/index.ts";
+import { defineCommand } from "../../core/define-command.ts";
+import { formatTable } from "../../core/format.ts";
+import { logger } from "../../core/logger.ts";
+import { spinner } from "../../core/ui.ts";
+import { clientOptions } from "../../core/client-options.ts";
 
 const COMMAND = "list";
 const DESCRIPTION = "List container registries.";
 
-export const appsRegistryListCommand = defineCommand({
+export const registryListCommand = defineCommand({
   command: COMMAND,
   describe: DESCRIPTION,
   aliases: ["ls"],

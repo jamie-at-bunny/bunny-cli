@@ -42,6 +42,7 @@ src/
     ├── auth/             # Login/logout (top-level commands)
     ├── config/           # Config management (init, show, profile create/delete)
     ├── db/               # Databases (create, list, shell, usage, tokens)
+    ├── registry/         # Container registries (top-level: add, list, remove)
     ├── scripts/          # Edge Scripts (init, link, list, show)
     └── whoami.ts         # Show authenticated account (top-level command)
 ```

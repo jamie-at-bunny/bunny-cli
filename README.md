@@ -293,7 +293,7 @@ bunny apps show --id <app-id>
 
 #### `bunny apps deploy`
 
-Deploy an app. If `bunny.jsonc` has no `id`, the app is created on Bunny first. If `dockerfile` is set in the container config, the image is built and pushed automatically (prompts for a registry if not configured). Use `--image` to skip the build and deploy a pre-built image.
+Deploy an app. If `bunny.jsonc` has no `id`, the app is created on Bunny first. If `dockerfile` is set in the primary container config (first entry in `containers`), the image is built and pushed automatically (prompts for a registry if not configured). Use `--image` to skip the build and deploy a pre-built image.
 
 ```bash
 # Build from Dockerfile + deploy
@@ -319,25 +319,6 @@ bunny apps pull --force
 # Push local bunny.jsonc to remote
 bunny apps push
 bunny apps push --dry-run
-```
-
-#### `bunny apps accessory`
-
-Manage accessory containers (databases, caches, sidecars). Accessories are defined in the `accessories` section of `bunny.jsonc`.
-
-```bash
-# List accessories
-bunny apps accessory list
-
-# Start an accessory from bunny.toml
-bunny apps accessory start postgres
-bunny apps accessory start all
-
-# Stop an accessory
-bunny apps accessory stop redis --force
-
-# Restart all containers
-bunny apps accessory restart
 ```
 
 #### `bunny apps env`
@@ -390,14 +371,14 @@ bunny apps regions list
 bunny apps regions show
 ```
 
-#### `bunny apps registry`
+### `bunny registry`
 
-Manage container registries (account-level).
+Manage container registries.
 
 ```bash
-bunny apps registry list
-bunny apps registry add --name "GitHub" --username myorg
-bunny apps registry remove <registry-id>
+bunny registry list
+bunny registry add --name "GitHub" --username myorg
+bunny registry remove <registry-id>
 ```
 
 ### `bunny scripts`

@@ -22,11 +22,13 @@ Requires `@bunny.net/api` as a peer dependency (for API type definitions used by
       "allowed": ["EU-West", "US-East"],
       "required": ["EU-West"]
     },
-    "container": {
-      "image": "nginx:latest",
-      "endpoints": [
-        { "type": "cdn", "ssl": true, "ports": [{ "public": 80, "container": 8080 }] }
-      ]
+    "containers": {
+      "web": {
+        "image": "nginx:latest",
+        "endpoints": [
+          { "type": "cdn", "ssl": true, "ports": [{ "public": 80, "container": 8080 }] }
+        ]
+      }
     }
   }
 }
@@ -40,7 +42,7 @@ Zod schemas define the config structure. Types are inferred from schemas (single
 
 | Schema                    | Type               | Description                          |
 | ------------------------- | ------------------ | ------------------------------------ |
-| `BunnyAppConfigSchema`    | `BunnyAppConfig`   | Root config (app + accessories)      |
+| `BunnyAppConfigSchema`    | `BunnyAppConfig`   | Root config (app + containers)       |
 | `ContainerConfigSchema`   | `ContainerConfig`  | Container: image, env, probes, etc.  |
 | `EndpointConfigSchema`    | `EndpointConfig`   | CDN or Anycast endpoint              |
 | `VolumeConfigSchema`      | `VolumeConfig`     | Persistent volume mount              |

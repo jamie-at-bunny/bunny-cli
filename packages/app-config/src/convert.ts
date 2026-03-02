@@ -55,16 +55,26 @@ function containerTemplateToConfig(ct: ContainerTemplate): ContainerConfig {
 
 /** Convert an API Application response to BunnyAppConfig. */
 export function apiToConfig(app: Application): BunnyAppConfig {
-  const primary = app.containerTemplates[0];
-  const accessories = app.containerTemplates.slice(1);
+  const volumeSizeMap = new Map(
+    app.volumes.map((v) => [v.name, v.size]),
+  );
+
+  const containers: Record<string, ReturnType<typeof containerTemplateToConfig>> = {};
+  for (const ct of app.containerTemplates) {
+    const c = containerTemplateToConfig(ct);
+    if (c.volumes) {
+      for (const vol of c.volumes) {
+        vol.size = volumeSizeMap.get(vol.name) ?? 0;
+      }
+    }
+    containers[ct.name] = c;
+  }
 
   const config: BunnyAppConfig = {
     app: {
       id: app.id,
       name: app.name,
-      container: primary
-        ? containerTemplateToConfig(primary)
-        : {},
+      containers,
     },
   };
 
@@ -83,30 +93,6 @@ export function apiToConfig(app: Application): BunnyAppConfig {
       allowed: app.regionSettings.allowedRegionIds,
       required: app.regionSettings.requiredRegionIds,
     };
-  }
-
-  // Merge volume sizes from the app-level volumes into container configs
-  const volumeSizeMap = new Map(
-    app.volumes.map((v) => [v.name, v.size]),
-  );
-
-  if (config.app.container.volumes) {
-    for (const vol of config.app.container.volumes) {
-      vol.size = volumeSizeMap.get(vol.name) ?? 0;
-    }
-  }
-
-  if (accessories.length > 0) {
-    config.accessories = {};
-    for (const ct of accessories) {
-      const acc = containerTemplateToConfig(ct);
-      if (acc.volumes) {
-        for (const vol of acc.volumes) {
-          vol.size = volumeSizeMap.get(vol.name) ?? 0;
-        }
-      }
-      config.accessories[ct.name] = acc;
-    }
   }
 
   return config;
@@ -202,18 +188,9 @@ export function configToAddRequest(config: BunnyAppConfig): AddApplicationReques
   const volumes: VolumeRequest[] = [];
   const seenVolumes = new Set<string>();
 
-  // Primary container
-  containers.push(
-    containerConfigToRequest(config.app.name, config.app.container),
-  );
-  collectVolumes(config.app.container, volumes, seenVolumes);
-
-  // Accessories
-  if (config.accessories) {
-    for (const [name, acc] of Object.entries(config.accessories)) {
-      containers.push(containerConfigToRequest(name, acc));
-      collectVolumes(acc, volumes, seenVolumes);
-    }
+  for (const [name, c] of Object.entries(config.app.containers)) {
+    containers.push(containerConfigToRequest(name, c));
+    collectVolumes(c, volumes, seenVolumes);
   }
 
   return {
@@ -238,26 +215,17 @@ export function configToPatchRequest(
   const volumes: VolumeRequest[] = [];
   const seenVolumes = new Set<string>();
 
-  // Primary container — keep existing ID (first container)
-  const primaryId = existingApp.containerTemplates[0]?.id;
-  containers.push(
-    containerConfigToRequest(
-      config.app.name,
-      config.app.container,
-      primaryId,
-    ),
-  );
-  collectVolumes(config.app.container, volumes, seenVolumes);
-
-  // Accessories — match by name to preserve IDs
-  if (config.accessories) {
-    for (const [name, acc] of Object.entries(config.accessories)) {
-      const existing = existingApp.containerTemplates.find(
-        (ct) => ct.name === name,
-      );
-      containers.push(containerConfigToRequest(name, acc, existing?.id));
-      collectVolumes(acc, volumes, seenVolumes);
-    }
+  // Match containers by name to preserve existing IDs
+  const entries = Object.entries(config.app.containers);
+  for (let i = 0; i < entries.length; i++) {
+    const [name, c] = entries[i]!;
+    // First container matches first existing template (primary); rest match by name
+    const existing =
+      i === 0
+        ? existingApp.containerTemplates[0]
+        : existingApp.containerTemplates.find((ct) => ct.name === name);
+    containers.push(containerConfigToRequest(name, c, existing?.id));
+    collectVolumes(c, volumes, seenVolumes);
   }
 
   return {

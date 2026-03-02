@@ -48,356 +48,187 @@
           },
           "additionalProperties": false
         },
-        "container": {
+        "containers": {
           "type": "object",
-          "properties": {
-            "image": {
-              "type": "string"
-            },
-            "dockerfile": {
-              "type": "string"
-            },
-            "command": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "registry": {
-              "type": "string"
-            },
-            "env": {
-              "type": "object",
-              "propertyNames": {
-                "type": "string"
-              },
-              "additionalProperties": {
-                "type": "string"
-              }
-            },
-            "probes": {
-              "type": "object",
-              "properties": {
-                "readiness": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "enum": [
-                        "http",
-                        "tcp",
-                        "grpc"
-                      ]
-                    },
-                    "path": {
-                      "type": "string"
-                    },
-                    "port": {
-                      "type": "number"
-                    }
-                  },
-                  "required": [
-                    "type"
-                  ],
-                  "additionalProperties": false
-                },
-                "liveness": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "enum": [
-                        "http",
-                        "tcp",
-                        "grpc"
-                      ]
-                    },
-                    "path": {
-                      "type": "string"
-                    },
-                    "port": {
-                      "type": "number"
-                    }
-                  },
-                  "required": [
-                    "type"
-                  ],
-                  "additionalProperties": false
-                },
-                "startup": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "enum": [
-                        "http",
-                        "tcp",
-                        "grpc"
-                      ]
-                    },
-                    "path": {
-                      "type": "string"
-                    },
-                    "port": {
-                      "type": "number"
-                    }
-                  },
-                  "required": [
-                    "type"
-                  ],
-                  "additionalProperties": false
-                }
-              },
-              "additionalProperties": false
-            },
-            "endpoints": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "cdn",
-                      "anycast"
-                    ]
-                  },
-                  "ssl": {
-                    "type": "boolean"
-                  },
-                  "ports": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "public": {
-                          "type": "number"
-                        },
-                        "container": {
-                          "type": "number"
-                        }
-                      },
-                      "required": [
-                        "public",
-                        "container"
-                      ],
-                      "additionalProperties": false
-                    }
-                  }
-                },
-                "required": [
-                  "type"
-                ],
-                "additionalProperties": false
-              }
-            },
-            "volumes": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "mount": {
-                    "type": "string"
-                  },
-                  "size": {
-                    "type": "number"
-                  }
-                },
-                "required": [
-                  "name",
-                  "mount",
-                  "size"
-                ],
-                "additionalProperties": false
-              }
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "required": [
-        "name",
-        "container"
-      ],
-      "additionalProperties": false
-    },
-    "accessories": {
-      "type": "object",
-      "propertyNames": {
-        "type": "string"
-      },
-      "additionalProperties": {
-        "type": "object",
-        "properties": {
-          "image": {
+          "propertyNames": {
             "type": "string"
           },
-          "dockerfile": {
-            "type": "string"
-          },
-          "command": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "registry": {
-            "type": "string"
-          },
-          "env": {
-            "type": "object",
-            "propertyNames": {
-              "type": "string"
-            },
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "probes": {
+          "additionalProperties": {
             "type": "object",
             "properties": {
-              "readiness": {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "http",
-                      "tcp",
-                      "grpc"
-                    ]
-                  },
-                  "path": {
-                    "type": "string"
-                  },
-                  "port": {
-                    "type": "number"
-                  }
-                },
-                "required": [
-                  "type"
-                ],
-                "additionalProperties": false
+              "image": {
+                "type": "string"
               },
-              "liveness": {
-                "type": "object",
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "http",
-                      "tcp",
-                      "grpc"
-                    ]
-                  },
-                  "path": {
-                    "type": "string"
-                  },
-                  "port": {
-                    "type": "number"
-                  }
-                },
-                "required": [
-                  "type"
-                ],
-                "additionalProperties": false
+              "dockerfile": {
+                "type": "string"
               },
-              "startup": {
+              "command": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "registry": {
+                "type": "string"
+              },
+              "env": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "probes": {
                 "type": "object",
                 "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "http",
-                      "tcp",
-                      "grpc"
-                    ]
-                  },
-                  "path": {
-                    "type": "string"
-                  },
-                  "port": {
-                    "type": "number"
-                  }
-                },
-                "required": [
-                  "type"
-                ],
-                "additionalProperties": false
-              }
-            },
-            "additionalProperties": false
-          },
-          "endpoints": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string",
-                  "enum": [
-                    "cdn",
-                    "anycast"
-                  ]
-                },
-                "ssl": {
-                  "type": "boolean"
-                },
-                "ports": {
-                  "type": "array",
-                  "items": {
+                  "readiness": {
                     "type": "object",
                     "properties": {
-                      "public": {
-                        "type": "number"
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "http",
+                          "tcp",
+                          "grpc"
+                        ]
                       },
-                      "container": {
+                      "path": {
+                        "type": "string"
+                      },
+                      "port": {
                         "type": "number"
                       }
                     },
                     "required": [
-                      "public",
-                      "container"
+                      "type"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "liveness": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "http",
+                          "tcp",
+                          "grpc"
+                        ]
+                      },
+                      "path": {
+                        "type": "string"
+                      },
+                      "port": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "startup": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "http",
+                          "tcp",
+                          "grpc"
+                        ]
+                      },
+                      "path": {
+                        "type": "string"
+                      },
+                      "port": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "type"
                     ],
                     "additionalProperties": false
                   }
+                },
+                "additionalProperties": false
+              },
+              "endpoints": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "cdn",
+                        "anycast"
+                      ]
+                    },
+                    "ssl": {
+                      "type": "boolean"
+                    },
+                    "ports": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "public": {
+                            "type": "number"
+                          },
+                          "container": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "public",
+                          "container"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "additionalProperties": false
                 }
               },
-              "required": [
-                "type"
-              ],
-              "additionalProperties": false
-            }
-          },
-          "volumes": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string"
-                },
-                "mount": {
-                  "type": "string"
-                },
-                "size": {
-                  "type": "number"
+              "volumes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "mount": {
+                      "type": "string"
+                    },
+                    "size": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "mount",
+                    "size"
+                  ],
+                  "additionalProperties": false
                 }
-              },
-              "required": [
-                "name",
-                "mount",
-                "size"
-              ],
-              "additionalProperties": false
-            }
+              }
+            },
+            "additionalProperties": false
           }
-        },
-        "additionalProperties": false
-      }
+        }
+      },
+      "required": [
+        "name",
+        "containers"
+      ],
+      "additionalProperties": false
     }
   },
   "required": [
