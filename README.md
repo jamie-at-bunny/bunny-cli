@@ -393,18 +393,47 @@ Create a new Edge Script project from a template.
 # Interactive wizard
 bunny scripts init
 
-# Non-interactive
-bunny scripts init --name my-script --type standalone --template Empty --deploy
+# Non-interactive with CLI deployment
+bunny scripts init --name my-script --type standalone --template Empty --deploy-method cli --deploy
+
+# Non-interactive with GitHub Actions
+bunny scripts init --name my-script --type standalone --template Empty --deploy-method github --deploy
 ```
 
-| Flag             | Description                               |
-| ---------------- | ----------------------------------------- |
-| `--name`         | Project directory name                    |
-| `--type`         | Script type: `standalone` or `middleware` |
-| `--template`     | Template name                             |
-| `--deploy`       | Deploy after creation                     |
-| `--skip-git`     | Skip git initialization                   |
-| `--skip-install` | Skip dependency installation              |
+| Flag              | Description                                          |
+| ----------------- | ---------------------------------------------------- |
+| `--name`          | Project directory name                               |
+| `--type`          | Script type: `standalone` or `middleware`             |
+| `--template`      | Template name                                        |
+| `--deploy-method` | Deployment method: `github` or `cli`                 |
+| `--deploy`        | Create script on bunny.net after scaffolding         |
+| `--skip-git`      | Skip git initialization (CLI deploy method only)     |
+| `--skip-install`  | Skip dependency installation                         |
+
+When choosing **GitHub Actions**, git is initialized automatically, GitHub-specific workflow files are kept, and after creating the script you'll be shown the `SCRIPT_ID` to add as a GitHub repo secret.
+
+When choosing **CLI**, the `.github/` and `.changeset/` directories are removed from the template and git initialization is skipped.
+
+#### `bunny scripts deploy`
+
+Deploy code to an Edge Script. Uploads code and publishes by default.
+
+```bash
+# Deploy and publish
+bunny scripts deploy dist/index.js
+
+# Deploy without publishing
+bunny scripts deploy dist/index.js --skip-publish
+
+# Deploy to a specific script
+bunny scripts deploy dist/index.js 12345
+```
+
+| Flag              | Description                    |
+| ----------------- | ------------------------------ |
+| `--skip-publish`  | Upload code without publishing |
+
+> **Note:** `bunny scripts deploy` works regardless of how the script was created or whether GitHub Actions is configured. The last deployment always wins — whether triggered by a GitHub Action or a manual CLI deploy.
 
 #### `bunny scripts link`
 

@@ -6,7 +6,7 @@ import { defineCommand } from "../../core/define-command.ts";
 import { UserError } from "../../core/errors.ts";
 import { logger } from "../../core/logger.ts";
 import { resolveManifestId } from "../../core/manifest.ts";
-import { confirm, spinner } from "../../core/ui.ts";
+import { spinner } from "../../core/ui.ts";
 import { SCRIPT_MANIFEST } from "./constants.ts";
 import { clientOptions } from "../../core/client-options.ts";
 
@@ -17,33 +17,29 @@ const ARG_FILE = "file";
 const ARG_FILE_DESCRIPTION = "Path to the built file to deploy";
 const ARG_ID = "id";
 const ARG_ID_DESCRIPTION = "Edge Script ID (uses linked script if omitted)";
-const ARG_PUBLISH = "publish";
-const ARG_PUBLISH_ALIAS = "p";
-const ARG_PUBLISH_DESCRIPTION = "Publish the deployment immediately";
+const ARG_SKIP_PUBLISH = "skip-publish";
+const ARG_SKIP_PUBLISH_DESCRIPTION = "Upload code without publishing";
 
 interface DeployArgs {
   [ARG_FILE]: string;
   [ARG_ID]?: number;
-  [ARG_PUBLISH]?: boolean;
+  [ARG_SKIP_PUBLISH]?: boolean;
 }
 
 /**
  * Deploy code to an Edge Script.
  *
- * Reads the specified file and uploads it as the script code. Optionally
- * publishes the deployment as a live release. When neither `--publish`
- * nor `--no-publish` is passed, prompts interactively.
+ * Reads the specified file and uploads it as the script code. Publishes
+ * the deployment as a live release by default. Use `--skip-publish` to
+ * upload code without publishing.
  *
  * @example
  * ```bash
- * # Deploy and prompt to publish
+ * # Deploy and publish
  * bunny scripts deploy dist/index.js
  *
- * # Deploy and publish immediately
- * bunny scripts deploy dist/index.js --publish
- *
  * # Deploy without publishing
- * bunny scripts deploy dist/index.js --no-publish
+ * bunny scripts deploy dist/index.js --skip-publish
  *
  * # Deploy to a specific script
  * bunny scripts deploy dist/index.js 12345
@@ -64,16 +60,15 @@ export const scriptsDeployCommand = defineCommand<DeployArgs>({
         type: "number",
         describe: ARG_ID_DESCRIPTION,
       })
-      .option(ARG_PUBLISH, {
-        alias: ARG_PUBLISH_ALIAS,
+      .option(ARG_SKIP_PUBLISH, {
         type: "boolean",
-        describe: ARG_PUBLISH_DESCRIPTION,
+        describe: ARG_SKIP_PUBLISH_DESCRIPTION,
       }),
 
   handler: async ({
     [ARG_FILE]: file,
     [ARG_ID]: rawId,
-    [ARG_PUBLISH]: publish,
+    [ARG_SKIP_PUBLISH]: skipPublish,
     profile,
     output,
     verbose,
@@ -102,13 +97,7 @@ export const scriptsDeployCommand = defineCommand<DeployArgs>({
     spin.stop();
     logger.success("Code uploaded.");
 
-    let published = false;
-
-    if (publish === true) {
-      published = true;
-    } else if (publish === undefined) {
-      published = await confirm("Publish this deployment?");
-    }
+    const published = !skipPublish;
 
     if (published) {
       const pubSpin = spinner("Publishing...");

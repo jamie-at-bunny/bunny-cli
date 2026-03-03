@@ -674,8 +674,12 @@ bunny
 │       │                                   Generate an auth token
 │       └── invalidate  [database-id] [--force]   Invalidate all tokens for a database
 ├── scripts
-│   ├── init            [--name] [--type] [--template] [--deploy] [--skip-git] [--skip-install]
+│   ├── init            [--name] [--type] [--template] [--deploy-method] [--deploy] [--skip-git] [--skip-install]
 │   │                                       Create a new Edge Script project from a template
+│   ├── deploy          <file> [id] [--skip-publish]
+│   │                                       Deploy code to an Edge Script (publishes by default)
+│   ├── deployments
+│   │   └── list        [id] (alias: ls)    List deployments for an Edge Script
 │   ├── link            [--id]              Link directory to a remote Edge Script
 │   ├── list            (alias: ls)         List all Edge Scripts
 │   └── show            [id]                Show Edge Script details (uses linked script if omitted)
