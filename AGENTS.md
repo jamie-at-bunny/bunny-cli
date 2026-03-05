@@ -1058,3 +1058,51 @@ bunny db shell seed.sql
 8. Use `logger` for all output. **Every command that returns data must support `--output json`.**
 9. Throw `UserError` for expected failures. Let unexpected errors propagate to the factory's catch block.
 10. Register the new command/namespace in `packages/cli/src/cli.ts`.
+
+---
+
+## Roadmap: Plugin System
+
+The CLI is designed to support a future plugin ecosystem. This section documents the planned architecture so that current work remains compatible with it.
+
+### Concept
+
+Plugins are npm packages that export yargs `CommandModule` objects (the same shape produced by `defineCommand` and `defineNamespace`). The CLI discovers and registers them at startup.
+
+### Plugin discovery
+
+Plugins are listed in the user's config file (`~/.bunny/config.jsonc`):
+
+```jsonc
+{
+  "profiles": { ... },
+  "plugins": [
+    "bunny-cli-plugin-analytics",
+    "@acme/bunny-cli-plugin-deploy"
+  ]
+}
+```
+
+### Plugin management commands
+
+```
+bunny plugins list              # Show installed plugins
+bunny plugins add <package>     # Install + register in config
+bunny plugins remove <package>  # Unregister + uninstall
+```
+
+### Prerequisites
+
+Before plugins can ship, the CLI core utilities need to be extracted into a shared package (`@bunny.net/cli-core`) so plugin authors can use the same primitives:
+
+- `defineCommand`, `defineNamespace`
+- `resolveConfig`, `clientOptions`
+- `formatTable`, `formatKeyValue`
+- `logger`, `UserError`
+
+### Design principles
+
+- **Keep `defineCommand` and `defineNamespace` interfaces clean and stable** — they will become the public plugin API.
+- **Built-in over plugin for core bunny.net primitives** — analytics, streaming, storage sync, DNS, and logs should be first-class commands, not plugins.
+- **Plugins are best for**: framework-specific adapters (Next.js, Laravel, WordPress), third-party integrations (Datadog, Slack, PagerDuty), and organization-specific workflows.
+- **Unix composability first** — built-in commands should output to stdout in structured formats (`--output json`) so users can pipe to any tool. Plugins add value with pre-built integrations on top.
