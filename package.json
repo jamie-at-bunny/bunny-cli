@@ -10,9 +10,14 @@
     "build": "bun build packages/cli/src/index.ts --compile --outfile bunny",
     "typecheck": "bun run tsc --noEmit",
     "api:generate": "bun run --filter @bunny.net/api generate",
-    "api:update": "bun run --filter @bunny.net/api update-specs"
+    "api:update": "bun run --filter @bunny.net/api update-specs",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "changeset publish"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.6.0",
+    "@changesets/cli": "^2.30.0",
     "@types/bun": "latest"
   },
   "peerDependencies": {

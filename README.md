@@ -47,6 +47,21 @@ bun run api:update
 bun run api:generate
 ```
 
+### Changesets
+
+This monorepo uses [changesets](https://github.com/changesets/changesets) for versioning and changelogs.
+
+```bash
+# Add a changeset (interactive prompt)
+bun run changeset
+
+# Apply changesets and bump versions
+bun run version
+
+# Publish all packages
+bun run release
+```
+
 ### Making the CLI available globally
 
 ```bash
