@@ -36,7 +36,7 @@
       "name": "@bunny.net/cli",
       "version": "0.1.0",
       "bin": {
-        "bunny": "./src/index.ts",
+        "bunny": "./bin/bunny.js",
       },
       "dependencies": {
         "@bunny.net/api": "workspace:*",
@@ -56,10 +56,40 @@
         "@types/prompts": "^2.4.9",
         "@types/yargs": "^17.0.35",
       },
+      "optionalDependencies": {
+        "@bunny.net/cli-darwin-arm64": "0.1.0",
+        "@bunny.net/cli-darwin-x64": "0.1.0",
+        "@bunny.net/cli-linux-arm64": "0.1.0",
+        "@bunny.net/cli-linux-x64": "0.1.0",
+        "@bunny.net/cli-windows-x64": "0.1.0",
+      },
+    },
+    "packages/cli-darwin-arm64": {
+      "name": "@bunny.net/cli-darwin-arm64",
+      "version": "0.1.0",
+    },
+    "packages/cli-darwin-x64": {
+      "name": "@bunny.net/cli-darwin-x64",
+      "version": "0.1.0",
+    },
+    "packages/cli-linux-arm64": {
+      "name": "@bunny.net/cli-linux-arm64",
+      "version": "0.1.0",
+    },
+    "packages/cli-linux-x64": {
+      "name": "@bunny.net/cli-linux-x64",
+      "version": "0.1.0",
+    },
+    "packages/cli-windows-x64": {
+      "name": "@bunny.net/cli-windows-x64",
+      "version": "0.1.0",
     },
     "packages/database-shell": {
       "name": "@bunny.net/database-shell",
       "version": "0.1.0",
+      "bin": {
+        "bsql": "./src/cli.ts",
+      },
       "dependencies": {
         "@libsql/client": "^0.17.0",
         "chalk": "^5.6.2",
@@ -79,6 +109,16 @@
     "@bunny.net/app-config": ["@bunny.net/app-config@workspace:packages/app-config"],
 
     "@bunny.net/cli": ["@bunny.net/cli@workspace:packages/cli"],
+
+    "@bunny.net/cli-darwin-arm64": ["@bunny.net/cli-darwin-arm64@workspace:packages/cli-darwin-arm64"],
+
+    "@bunny.net/cli-darwin-x64": ["@bunny.net/cli-darwin-x64@workspace:packages/cli-darwin-x64"],
+
+    "@bunny.net/cli-linux-arm64": ["@bunny.net/cli-linux-arm64@workspace:packages/cli-linux-arm64"],
+
+    "@bunny.net/cli-linux-x64": ["@bunny.net/cli-linux-x64@workspace:packages/cli-linux-x64"],
+
+    "@bunny.net/cli-windows-x64": ["@bunny.net/cli-windows-x64@workspace:packages/cli-windows-x64"],
 
     "@bunny.net/database-shell": ["@bunny.net/database-shell@workspace:packages/database-shell"],
 
