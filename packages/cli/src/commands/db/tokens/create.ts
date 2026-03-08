@@ -16,6 +16,7 @@ const DESCRIPTION = "Generate an auth token for a database.";
 const ARG_READ_ONLY = "read-only";
 const ARG_EXPIRY = "expiry";
 const ARG_EXPIRY_ALIAS = "e";
+const ARG_SAVE = "save";
 const ARG_FORCE = "force";
 const ARG_FORCE_ALIAS = "f";
 
@@ -84,6 +85,9 @@ function parseExpiry(value: string): string {
  * # Skip prompts and auto-save to .env
  * bunny db tokens create --force
  *
+ * # Generate token without .env prompt
+ * bunny db tokens create --no-save
+ *
  * # JSON output for scripting
  * bunny db tokens create --output json
  * ```
@@ -92,6 +96,7 @@ export const dbTokensCreateCommand = defineCommand<{
   [ARG_DATABASE_ID]?: string;
   [ARG_READ_ONLY]?: boolean;
   [ARG_EXPIRY]?: string;
+  [ARG_SAVE]?: boolean;
   [ARG_FORCE]?: boolean;
 }>({
   command: COMMAND,
@@ -114,6 +119,11 @@ export const dbTokensCreateCommand = defineCommand<{
         type: "string",
         describe: "Token expiry (e.g. 30d, 12h, 1y, or RFC 3339 date)",
       })
+      .option(ARG_SAVE, {
+        type: "boolean",
+        default: true,
+        describe: "Prompt to save token to .env (use --no-save to skip)",
+      })
       .option(ARG_FORCE, {
         alias: ARG_FORCE_ALIAS,
         type: "boolean",
@@ -125,6 +135,7 @@ export const dbTokensCreateCommand = defineCommand<{
     [ARG_DATABASE_ID]: databaseIdArg,
     "read-only": readOnly,
     expiry,
+    save,
     force,
     profile,
     output,
@@ -196,7 +207,7 @@ export const dbTokensCreateCommand = defineCommand<{
     logger.log();
 
     // Offer to save to .env
-    if (!token) return;
+    if (!token || !save) return;
 
     const existingToken = readEnvValue(ENV_DATABASE_AUTH_TOKEN);
     let shouldWrite = false;
