@@ -1,4 +1,5 @@
 import { defineNamespace } from "../../core/define-namespace.ts";
+import { scriptsDeleteCommand } from "./delete.ts";
 import { scriptsDeployCommand } from "./deploy.ts";
 import { scriptsDeploymentsNamespace } from "./deployments/index.ts";
 import { scriptsDocsCommand } from "./docs.ts";
@@ -12,6 +13,7 @@ export const scriptsNamespace = defineNamespace(
   "scripts",
   "Manage Edge Scripts.",
   [
+    scriptsDeleteCommand,
     scriptsDeployCommand,
     scriptsDeploymentsNamespace,
     scriptsDocsCommand,
