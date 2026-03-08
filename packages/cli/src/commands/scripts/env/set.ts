@@ -91,6 +91,7 @@ export const scriptsEnvSetCommand = defineCommand<SetArgs>({
   }) => {
     const id = resolveManifestId(SCRIPT_MANIFEST, rawId, "script");
 
+    const interactive = !rawName;
     let name = rawName;
     if (!name) {
       const { value } = await prompts({
@@ -104,13 +105,17 @@ export const scriptsEnvSetCommand = defineCommand<SetArgs>({
 
     let isSecret = secret;
     if (isSecret === undefined) {
-      const { confirmed } = await prompts({
-        type: "confirm",
-        name: "confirmed",
-        message: "Is this a secret?",
-        initial: false,
-      });
-      isSecret = confirmed ?? false;
+      if (interactive) {
+        const { confirmed } = await prompts({
+          type: "confirm",
+          name: "confirmed",
+          message: "Is this a secret?",
+          initial: false,
+        });
+        isSecret = confirmed ?? false;
+      } else {
+        isSecret = false;
+      }
     }
 
     let value = rawValue;

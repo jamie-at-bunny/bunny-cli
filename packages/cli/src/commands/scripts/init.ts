@@ -24,6 +24,8 @@ const ARG_TYPE = "type";
 const ARG_TYPE_DESCRIPTION = "Script type";
 const ARG_TEMPLATE = "template";
 const ARG_TEMPLATE_DESCRIPTION = "Template name";
+const ARG_TEMPLATE_REPO = "template-repo";
+const ARG_TEMPLATE_REPO_DESCRIPTION = "Git repository URL to use as template";
 const ARG_DEPLOY = "deploy";
 const ARG_DEPLOY_DESCRIPTION = "Deploy after creation";
 const ARG_DEPLOY_METHOD = "deploy-method";
@@ -40,6 +42,7 @@ interface InitArgs {
   [ARG_NAME]?: string;
   [ARG_TYPE]?: string;
   [ARG_TEMPLATE]?: string;
+  [ARG_TEMPLATE_REPO]?: string;
   [ARG_DEPLOY]?: boolean;
   [ARG_DEPLOY_METHOD]?: string;
   [ARG_SKIP_GIT]?: boolean;
@@ -66,6 +69,9 @@ interface InitArgs {
  *
  * # Skip dependency installation
  * bunny scripts init --name my-script --skip-install
+ *
+ * # Use a custom template repo
+ * bunny scripts init --name my-script --type standalone --template-repo https://github.com/user/my-template
  * ```
  */
 export const scriptsInitCommand = defineCommand<InitArgs>({
@@ -87,6 +93,10 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
         type: "string",
         describe: ARG_TEMPLATE_DESCRIPTION,
       })
+      .option(ARG_TEMPLATE_REPO, {
+        type: "string",
+        describe: ARG_TEMPLATE_REPO_DESCRIPTION,
+      })
       .option(ARG_DEPLOY, {
         type: "boolean",
         describe: ARG_DEPLOY_DESCRIPTION,
@@ -107,6 +117,9 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
 
   handler: async (args) => {
     const { profile, output, verbose, apiKey } = args;
+
+    // Detect non-interactive mode: name was provided via flag
+    const interactive = !args[ARG_NAME];
 
     // Step 1: Directory name
     let dirName = args[ARG_NAME];
@@ -151,7 +164,17 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
     const filtered = TEMPLATES.filter((t) => t.scriptType === scriptType);
     let selected: Template | undefined;
 
-    if (args[ARG_TEMPLATE]) {
+    if (args[ARG_TEMPLATE_REPO]) {
+      if (args[ARG_TEMPLATE]) {
+        throw new UserError("Cannot use both --template and --template-repo.");
+      }
+      selected = {
+        name: "Custom",
+        description: "Custom template repository",
+        repo: args[ARG_TEMPLATE_REPO],
+        scriptType: scriptType!,
+      };
+    } else if (args[ARG_TEMPLATE]) {
       selected = filtered.find(
         (t) => t.name.toLowerCase() === args[ARG_TEMPLATE]!.toLowerCase(),
       );
@@ -161,7 +184,7 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
           `Available templates: ${filtered.map((t) => t.name).join(", ")}`,
         );
       }
-    } else {
+    } else if (interactive) {
       const { value } = await prompts({
         type: "select",
         name: "value",
@@ -172,6 +195,8 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
         })),
       });
       selected = value;
+    } else {
+      selected = filtered.find((t) => t.name.toLowerCase() === "empty");
     }
     if (!selected) throw new UserError("Template selection is required.");
 
@@ -180,7 +205,7 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
 
     if (args[ARG_DEPLOY_METHOD]) {
       deployMethod = args[ARG_DEPLOY_METHOD] as DeployMethod;
-    } else {
+    } else if (interactive) {
       const { value } = await prompts({
         type: "select",
         name: "value",
@@ -197,6 +222,8 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
         ],
       });
       deployMethod = value;
+    } else {
+      deployMethod = "cli";
     }
     if (!deployMethod) throw new UserError("Deployment method is required.");
 
@@ -251,7 +278,9 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
       existsSync(`${dirPath}/package.json`) &&
       args[ARG_SKIP_INSTALL] !== true
     ) {
-      const shouldInstall = await confirm("Install dependencies?");
+      const shouldInstall = interactive
+        ? await confirm("Install dependencies?")
+        : true;
       if (shouldInstall) {
         const installSpin = spinner("Installing dependencies...");
         installSpin.start();
@@ -304,7 +333,9 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
 
       logger.success("Initialized git repository.");
     } else if (args[ARG_SKIP_GIT] !== true) {
-      const shouldGit = await confirm("Initialize git repository?");
+      const shouldGit = interactive
+        ? await confirm("Initialize git repository?")
+        : true;
       if (shouldGit) {
         const gitInit = Bun.spawn(["git", "init"], {
           cwd: dirPath,
@@ -344,7 +375,9 @@ export const scriptsInitCommand = defineCommand<InitArgs>({
     const shouldDeploy =
       args[ARG_DEPLOY] !== undefined
         ? args[ARG_DEPLOY]
-        : await confirm(deployPrompt);
+        : interactive
+          ? await confirm(deployPrompt)
+          : false;
 
     if (shouldDeploy) {
       const config = resolveConfig(profile, apiKey);
