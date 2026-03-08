@@ -14,6 +14,7 @@ interface AddArgs {
   name?: string;
   server?: string;
   username?: string;
+  password?: string;
 }
 
 export const registryAddCommand = defineCommand<AddArgs>({
@@ -33,12 +34,17 @@ export const registryAddCommand = defineCommand<AddArgs>({
       .option("username", {
         type: "string",
         describe: "Registry username",
+      })
+      .option("password", {
+        type: "string",
+        describe: "Registry password or token",
       }),
 
   handler: async ({
     name: rawName,
     server,
     username: rawUsername,
+    password: rawPassword,
     profile,
     output,
     verbose,
@@ -66,11 +72,15 @@ export const registryAddCommand = defineCommand<AddArgs>({
     }
     if (!username) throw new UserError("Username is required.");
 
-    const { value: password } = await prompts({
-      type: "password",
-      name: "value",
-      message: "Password/Token:",
-    });
+    let password = rawPassword;
+    if (!password) {
+      const { value } = await prompts({
+        type: "password",
+        name: "value",
+        message: "Password/Token:",
+      });
+      password = value;
+    }
     if (!password) throw new UserError("Password is required.");
 
     const config = resolveConfig(profile, apiKey);

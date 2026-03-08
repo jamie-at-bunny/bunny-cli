@@ -22,6 +22,8 @@ const DESCRIPTION = "Invalidate all auth tokens for a database.";
 
 const ARG_FORCE = "force";
 const ARG_FORCE_ALIAS = "f";
+const ARG_REGENERATE = "regenerate";
+const ARG_SAVE_ENV = "save-env";
 
 /**
  * Invalidate all auth tokens for a database.
@@ -48,6 +50,9 @@ const ARG_FORCE_ALIAS = "f";
  * # Auto-detect database from .env, skip all prompts
  * bunny db tokens invalidate --force
  *
+ * # Invalidate, regenerate, and save to .env non-interactively
+ * bunny db tokens invalidate --force --regenerate --save-env
+ *
  * # JSON output (for scripting)
  * bunny db tokens invalidate db_01KCHBG8C5KSFGG0VRNFQ7EK7X --force --output json
  * ```
@@ -55,6 +60,8 @@ const ARG_FORCE_ALIAS = "f";
 export const dbTokensInvalidateCommand = defineCommand<{
   [ARG_DATABASE_ID]?: string;
   [ARG_FORCE]?: boolean;
+  [ARG_REGENERATE]?: boolean;
+  [ARG_SAVE_ENV]?: boolean;
 }>({
   command: COMMAND,
   describe: DESCRIPTION,
@@ -71,11 +78,22 @@ export const dbTokensInvalidateCommand = defineCommand<{
         type: "boolean",
         default: false,
         describe: "Skip confirmation prompts",
+      })
+      .option(ARG_REGENERATE, {
+        type: "boolean",
+        default: false,
+        describe: "Generate a replacement token after invalidation",
+      })
+      .option(ARG_SAVE_ENV, {
+        type: "boolean",
+        describe: "Save the new token to .env (requires --regenerate)",
       }),
 
   handler: async ({
     [ARG_DATABASE_ID]: databaseIdArg,
     force,
+    regenerate,
+    "save-env": saveEnv,
     profile,
     output,
     verbose,
@@ -134,10 +152,12 @@ export const dbTokensInvalidateCommand = defineCommand<{
       }
     }
 
-    // Offer to generate a replacement token (skipped entirely with --force)
-    if (force) return;
-
-    const shouldCreate = await confirm("Generate a new token?");
+    // Offer to generate a replacement token
+    // With --force: only generate if --regenerate is explicitly set
+    // Without --force: prompt the user
+    const shouldCreate = force
+      ? !!regenerate
+      : await confirm("Generate a new token?");
     if (!shouldCreate) return;
 
     const spin3 = spinner("Generating token...");
@@ -178,9 +198,11 @@ export const dbTokensInvalidateCommand = defineCommand<{
     logger.log();
 
     // Offer to persist the new token (and URL if missing) to .env
-    const shouldSave = await confirm(
-      `Save ${ENV_DATABASE_AUTH_TOKEN} to .env?`,
-    );
+    // --save-env bypasses the prompt; --save-env=false skips saving
+    const shouldSave =
+      saveEnv !== undefined
+        ? saveEnv
+        : await confirm(`Save ${ENV_DATABASE_AUTH_TOKEN} to .env?`);
     if (shouldSave) {
       const envPath = existingToken?.envPath;
       writeEnvValue(ENV_DATABASE_AUTH_TOKEN, newToken, envPath);

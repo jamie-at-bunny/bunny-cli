@@ -16,10 +16,15 @@ type PossibleRegion = components["schemas"]["PossibleRegion"];
 type Region = components["schemas"]["Region"];
 
 const COMMAND = `update [${ARG_DATABASE_ID}]`;
-const DESCRIPTION = "Interactively update region configuration.";
+const DESCRIPTION = "Update region configuration.";
+
+const ARG_PRIMARY = "primary";
+const ARG_REPLICAS = "replicas";
 
 interface UpdateArgs {
   [ARG_DATABASE_ID]?: string;
+  [ARG_PRIMARY]?: string;
+  [ARG_REPLICAS]?: string;
 }
 
 /**
@@ -30,16 +35,32 @@ interface UpdateArgs {
  *
  * @example
  * ```bash
+ * # Interactive — prompts for region selection
  * bunny db regions update
- * bunny db regions update db_01KCHBG8C5KSFGG0VRNFQ7EK7X
+ *
+ * # Non-interactive with explicit regions
+ * bunny db regions update --primary FR,DE --replicas UK
  * ```
  */
 export const dbRegionsUpdateCommand = defineCommand<UpdateArgs>({
   command: COMMAND,
   describe: DESCRIPTION,
 
+  builder: (yargs) =>
+    yargs
+      .option(ARG_PRIMARY, {
+        type: "string",
+        describe: "Comma-separated primary region IDs (e.g. FR or FR,DE)",
+      })
+      .option(ARG_REPLICAS, {
+        type: "string",
+        describe: "Comma-separated replica region IDs (e.g. UK,NY)",
+      }),
+
   handler: async ({
     [ARG_DATABASE_ID]: databaseIdArg,
+    [ARG_PRIMARY]: primaryArg,
+    [ARG_REPLICAS]: replicasArg,
     profile,
     output,
     verbose,
@@ -76,42 +97,54 @@ export const dbRegionsUpdateCommand = defineCommand<UpdateArgs>({
     const currentPrimary = new Set(db.primary_regions);
     const currentReplicas = new Set(db.replicas_regions);
 
-    // Show all regions with current ones pre-selected
-    const { value: selectedPrimary } = await prompts({
-      type: "multiselect",
-      name: "value",
-      message: "Primary regions:",
-      choices: groupedRegionChoices(availablePrimary, currentPrimary),
-      hint: "Space to toggle, Enter to confirm",
-    });
+    let newPrimary: PossibleRegion[];
+    let newReplicas: PossibleRegion[];
 
-    if (!selectedPrimary) {
-      logger.log("Cancelled.");
-      return;
+    if (primaryArg) {
+      // Non-interactive path: flags provided
+      newPrimary = primaryArg.split(",").map((s) => s.trim()) as PossibleRegion[];
+      newReplicas = replicasArg
+        ? (replicasArg.split(",").map((s) => s.trim()) as PossibleRegion[])
+        : [...currentReplicas];
+    } else {
+      // Interactive path: multi-select with current regions pre-selected
+      const { value: selectedPrimary } = await prompts({
+        type: "multiselect",
+        name: "value",
+        message: "Primary regions:",
+        choices: groupedRegionChoices(availablePrimary, currentPrimary),
+        hint: "Space to toggle, Enter to confirm",
+      });
+
+      if (!selectedPrimary) {
+        logger.log("Cancelled.");
+        return;
+      }
+
+      newPrimary = selectedPrimary as PossibleRegion[];
+
+      const { value: selectedReplicas } = await prompts({
+        type: "multiselect",
+        name: "value",
+        message: "Replica regions:",
+        choices: groupedRegionChoices(availableReplicas, currentReplicas),
+        hint: "Space to toggle, Enter to confirm (optional)",
+      });
+
+      if (!selectedReplicas) {
+        logger.log("Cancelled.");
+        return;
+      }
+
+      newReplicas = selectedReplicas as PossibleRegion[];
     }
 
-    const newPrimary = selectedPrimary as PossibleRegion[];
     if (newPrimary.length === 0) {
       throw new UserError(
         "Cannot remove all primary regions.",
         "At least one primary region is required.",
       );
     }
-
-    const { value: selectedReplicas } = await prompts({
-      type: "multiselect",
-      name: "value",
-      message: "Replica regions:",
-      choices: groupedRegionChoices(availableReplicas, currentReplicas),
-      hint: "Space to toggle, Enter to confirm (optional)",
-    });
-
-    if (!selectedReplicas) {
-      logger.log("Cancelled.");
-      return;
-    }
-
-    const newReplicas = selectedReplicas as PossibleRegion[];
 
     // Check if anything actually changed
     const primarySame =
