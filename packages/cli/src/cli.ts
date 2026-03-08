@@ -124,6 +124,7 @@ ${bunny("                                                                  .%@@*
       logger.dim("  Run `bunny login` to get started.\n");
     },
   )
+  .completion("completion", "Generate shell completion script")
   .recommendCommands()
   .strict()
   .fail((msg, err, yargs) => {
