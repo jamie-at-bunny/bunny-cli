@@ -1,5 +1,11 @@
 # @bunny.net/cli
 
+## 0.1.1
+
+### Patch Changes
+
+- [#6](https://github.com/BunnyWay/cli/pull/6) [`b32272f`](https://github.com/BunnyWay/cli/commit/b32272fb8bcf621980832f8a11a59679e266e54a) Thanks [@jamie-at-bunny](https://github.com/jamie-at-bunny)! - add missing platform arch in version flag
+
 ## 0.1.0
 
 ### Minor Changes
