@@ -1,6 +1,5 @@
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
-import { createClient } from "@libsql/client";
 import { defineCommand } from "../../core/define-command.ts";
 import { resolveConfig } from "../../config/index.ts";
 import { createDbClient } from "@bunny.net/api";
@@ -11,14 +10,7 @@ import { UserError } from "../../core/errors.ts";
 import { readEnvValue } from "../../utils/env-file.ts";
 import { ARG_DATABASE_ID, ENV_DATABASE_URL, ENV_DATABASE_AUTH_TOKEN } from "./constants.ts";
 import { clientOptions } from "../../core/client-options.ts";
-import {
-  startShell,
-  executeQuery,
-  executeFile,
-  PRINT_MODES,
-  type PrintMode,
-  type ShellLogger,
-} from "@bunny.net/database-shell";
+import type { PrintMode, ShellLogger } from "@bunny.net/database-shell";
 
 const COMMAND = `shell [${ARG_DATABASE_ID}] [query]`;
 const DESCRIPTION = "Open an interactive SQL shell for a database.";
@@ -30,6 +22,8 @@ const ARG_MODE_ALIAS = "m";
 const ARG_UNMASK = "unmask";
 const ARG_URL = "url";
 const ARG_TOKEN = "token";
+
+const PRINT_MODES = ["default", "table", "json", "csv", "markdown"];
 
 /** Create a ShellLogger adapter that wraps the CLI logger. */
 function shellLogger(): ShellLogger {
@@ -143,7 +137,7 @@ export const dbShellCommand = defineCommand<{
       .option(ARG_MODE, {
         alias: ARG_MODE_ALIAS,
         type: "string",
-        choices: PRINT_MODES as string[],
+        choices: PRINT_MODES,
         default: "default",
         describe: "Output mode (default, table, json, csv, markdown)",
       })
@@ -174,6 +168,9 @@ export const dbShellCommand = defineCommand<{
     verbose,
     apiKey,
   }) => {
+    const { createClient } = await import("@libsql/client");
+    const { startShell, executeQuery, executeFile } = await import("@bunny.net/database-shell");
+
     // If database-id doesn't look like a database ID, treat it as the query
     let databaseId = databaseIdArg;
     let sql = execArg ?? queryArg;

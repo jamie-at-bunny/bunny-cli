@@ -1,5 +1,3 @@
-const pkg = await Bun.file(
-  new URL("../../package.json", import.meta.url),
-).json();
+import pkg from "../../package.json";
 
 export const VERSION: string = pkg.version;
