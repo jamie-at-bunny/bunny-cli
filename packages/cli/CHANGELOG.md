@@ -1,5 +1,11 @@
 # @bunny.net/cli
 
+## 0.1.6
+
+### Patch Changes
+
+- [`2230dc1`](https://github.com/BunnyWay/cli/commit/2230dc1a5e4e9d8285e44ba0756cd3f11f3b5714) Thanks [@jamie-at-bunny](https://github.com/jamie-at-bunny)! - Fix published binaries missing execute permissions and improve error messages for binary execution failures
+
 ## 0.1.5
 
 ### Patch Changes
