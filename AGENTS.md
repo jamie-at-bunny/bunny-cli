@@ -74,7 +74,7 @@ This is a Bun workspace monorepo with four packages:
 
 - **`@bunny.net/api`** (`packages/api/`) — Standalone, type-safe API client SDK for bunny.net. Zero CLI dependencies. Publishable to npm.
 - **`@bunny.net/app-config`** (`packages/app-config/`) — Shared app configuration schemas (Zod), inferred types, JSON Schema generation, and API conversion functions. Used by the CLI and potentially other tools.
-- **`@bunny.net/database-shell`** (`packages/database-shell/`) — Standalone interactive SQL shell for libSQL databases. Framework-agnostic REPL, dot-commands, formatting, masking, and history. Also usable as a standalone CLI via `npx @bunny.net/database-shell` (binary: `bsql`).
+- **`@bunny.net/database-shell`** (`packages/database-shell/`) — Standalone interactive SQL shell for libSQL databases. Framework-agnostic REPL, dot-commands, formatting, masking, and history. Also usable as a standalone CLI (binary: `bsql`).
 - **`@bunny.net/cli`** (`packages/cli/`) — The CLI. Depends on `@bunny.net/api`, `@bunny.net/app-config`, and `@bunny.net/database-shell`.
 
 ```
@@ -122,7 +122,7 @@ bunny-cli/
 │   │   ├── package.json                  # bin: { "bsql": "./src/cli.ts" }
 │   │   ├── tsconfig.json
 │   │   └── src/
-│   │       ├── cli.ts                    # Standalone CLI entry point (npx @bunny.net/database-shell / bsql)
+│   │       ├── cli.ts                    # Standalone CLI entry point (bsql)
 │   │       ├── index.ts                  # Barrel export: startShell, executeQuery, executeFile, types
 │   │       ├── shell.ts                  # startShell() REPL engine, executeQuery(), executeFile()
 │   │       ├── dot-commands.ts           # .tables, .schema, .fk, .er, .truncate, .dump, .count, .size, etc.

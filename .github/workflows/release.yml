@@ -102,9 +102,7 @@ jobs:
         run: bun build packages/cli/src/index.ts --compile --minify --sourcemap --target=${{ matrix.target }} --outfile ${{ matrix.binary }}
 
       - name: Prepare npm package
-        run: |
-          chmod +x ${{ matrix.binary }}
-          cp ${{ matrix.binary }} packages/${{ matrix.npm-pkg }}/
+        run: cp ${{ matrix.binary }} packages/${{ matrix.npm-pkg }}/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -152,9 +150,7 @@ jobs:
         run: bun build packages/database-shell/src/cli.ts --compile --minify --sourcemap --target=${{ matrix.target }} --outfile ${{ matrix.binary }}
 
       - name: Prepare npm package
-        run: |
-          chmod +x ${{ matrix.binary }}
-          cp ${{ matrix.binary }} packages/${{ matrix.npm-pkg }}/
+        run: cp ${{ matrix.binary }} packages/${{ matrix.npm-pkg }}/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -187,6 +183,13 @@ jobs:
           for pkg in cli-linux-x64 cli-linux-arm64 cli-darwin-x64 cli-darwin-arm64 cli-windows-x64; do
             cp -r npm-artifacts/$pkg/* packages/$pkg/
           done
+
+      - name: Set execute permissions
+        run: |
+          chmod +x packages/cli-linux-x64/bunny
+          chmod +x packages/cli-linux-arm64/bunny
+          chmod +x packages/cli-darwin-x64/bunny
+          chmod +x packages/cli-darwin-arm64/bunny
 
       - name: Publish platform packages
         run: |
@@ -251,6 +254,13 @@ jobs:
           for pkg in database-shell-linux-x64 database-shell-linux-arm64 database-shell-darwin-x64 database-shell-darwin-arm64 database-shell-windows-x64; do
             cp -r npm-artifacts/$pkg/* packages/$pkg/
           done
+
+      - name: Set execute permissions
+        run: |
+          chmod +x packages/database-shell-linux-x64/bsql
+          chmod +x packages/database-shell-linux-arm64/bsql
+          chmod +x packages/database-shell-darwin-x64/bsql
+          chmod +x packages/database-shell-darwin-arm64/bsql
 
       - name: Publish platform packages
         run: |

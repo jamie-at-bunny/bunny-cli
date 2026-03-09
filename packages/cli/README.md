@@ -8,12 +8,6 @@ Command-line interface for [bunny.net](https://bunny.net) — manage databases, 
 npm install -g @bunny.net/cli
 ```
 
-Or run directly without installing:
-
-```bash
-npx @bunny.net/cli
-```
-
 ## Quick Start
 
 ```bash

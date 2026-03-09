@@ -6,14 +6,6 @@ Also powers `bunny db shell` in the [Bunny CLI](https://www.npmjs.com/package/@b
 
 ## Quick Start
 
-Run directly without installing:
-
-```bash
-npx @bunny.net/database-shell libsql://<your-database>.lite.bunnydb.net --token ey...
-```
-
-Or install globally:
-
 ```bash
 npm install -g @bunny.net/database-shell
 bsql libsql://<your-database>.lite.bunnydb.net --token ey...
