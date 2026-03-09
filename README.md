@@ -1,4 +1,4 @@
-# @bunny.net/monorepo
+# @bunny.net/monorepo!
 
 Monorepo for the [bunny.net](https://bunny.net) CLI and supporting packages.
 
