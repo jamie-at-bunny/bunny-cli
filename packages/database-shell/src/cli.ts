@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import { createClient } from "@libsql/client";
+import { createClient } from "@libsql/client/web";
 import { startShell, executeQuery, executeFile, PRINT_MODES } from "./index.ts";
 import type { PrintMode } from "./types.ts";
 

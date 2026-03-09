@@ -1,5 +1,6 @@
 ---
 "@bunny.net/cli": patch
+"@bunny.net/database-shell": patch
 ---
 
-Fix compiled binary crashing on startup by lazy-loading @libsql/client and @bunny.net/database-shell in the db shell command, and inlining the version from package.json at build time
+Switch from @libsql/client to @libsql/client/web to eliminate native addon dependency, fix compiled binary by lazy-loading database imports and inlining version at build time
