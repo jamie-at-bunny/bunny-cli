@@ -25,8 +25,6 @@ export {
 export type { MaskType } from "./format.ts";
 export {
   getDefaultViewsDir,
-  findLocalViewsDir,
-  resolveViewsDir,
   isValidViewName,
   saveView,
   loadView,

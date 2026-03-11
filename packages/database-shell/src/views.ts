@@ -1,43 +1,14 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync, unlinkSync, readdirSync } from "node:fs";
-import { join, dirname } from "node:path";
+import { join } from "node:path";
 import { homedir } from "node:os";
 
 const VIEW_EXT = ".sql";
 const VIEW_NAME_RE = /^[a-zA-Z0-9_-]+$/;
 
-/** Get the global views directory for a given database ID. */
+/** Get the default views directory for a given database ID. */
 export function getDefaultViewsDir(databaseId: string): string {
   const configDir = process.env.XDG_CONFIG_HOME ?? join(homedir(), ".config");
   return join(configDir, "bunny", "views", databaseId);
-}
-
-/**
- * Walk up from `startDir` looking for a `.bunny` directory.
- * Returns the `.bunny/<databaseId>/queries` path if `.bunny` is found, otherwise null.
- */
-export function findLocalViewsDir(databaseId: string, startDir?: string): string | null {
-  let dir = startDir ?? process.cwd();
-  while (true) {
-    const candidate = join(dir, ".bunny");
-    if (existsSync(candidate)) {
-      return join(candidate, databaseId, "queries");
-    }
-    const parent = dirname(dir);
-    if (parent === dir) break;
-    dir = parent;
-  }
-  return null;
-}
-
-/**
- * Resolve the views directory for a given database ID.
- *
- * Resolution order:
- * 1. Local `.bunny/<databaseId>/queries/` (walks up from CWD)
- * 2. Global `~/.config/bunny/views/<databaseId>/`
- */
-export function resolveViewsDir(databaseId: string): string {
-  return findLocalViewsDir(databaseId) ?? getDefaultViewsDir(databaseId);
 }
 
 /** Validate a view name (alphanumeric, hyphens, underscores). */

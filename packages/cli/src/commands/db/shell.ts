@@ -22,6 +22,7 @@ const ARG_MODE_ALIAS = "m";
 const ARG_UNMASK = "unmask";
 const ARG_URL = "url";
 const ARG_TOKEN = "token";
+const ARG_VIEWS_DIR = "views-dir";
 
 const PRINT_MODES = ["default", "table", "json", "csv", "markdown"];
 
@@ -109,6 +110,7 @@ export const dbShellCommand = defineCommand<{
   [ARG_UNMASK]?: boolean;
   [ARG_URL]?: string;
   [ARG_TOKEN]?: string;
+  [ARG_VIEWS_DIR]?: string;
 }>({
   command: COMMAND,
   describe: DESCRIPTION,
@@ -153,6 +155,10 @@ export const dbShellCommand = defineCommand<{
       .option(ARG_TOKEN, {
         type: "string",
         describe: "Auth token (skips token generation)",
+      })
+      .option(ARG_VIEWS_DIR, {
+        type: "string",
+        describe: "Directory for saved views (default: ~/.config/bunny/views/<db-id>/)",
       }),
 
   handler: async ({
@@ -163,6 +169,7 @@ export const dbShellCommand = defineCommand<{
     [ARG_UNMASK]: unmaskArg,
     [ARG_URL]: urlArg,
     [ARG_TOKEN]: tokenArg,
+    [ARG_VIEWS_DIR]: viewsDirArg,
     profile,
     output,
     verbose,
@@ -230,6 +237,7 @@ export const dbShellCommand = defineCommand<{
         masked: !unmaskArg,
         logger: log,
         databaseId: resolvedDbId,
+        viewsDir: viewsDirArg ? resolve(viewsDirArg) : undefined,
       });
     } catch (err: any) {
       throw new UserError(

@@ -7,7 +7,7 @@ import { printResultSet } from "./format.ts";
 import { splitStatements } from "./parser.ts";
 import { loadHistory, saveHistory, HISTORY_MAX } from "./history.ts";
 import { executeDotCommand } from "./dot-commands.ts";
-import { resolveViewsDir } from "./views.ts";
+import { getDefaultViewsDir } from "./views.ts";
 import type { ShellLogger, ShellOptions, ExecuteOptions } from "./types.ts";
 
 const PROMPT = chalk.blue.bold("→  ");
@@ -111,7 +111,7 @@ export async function startShell(options: ShellOptions): Promise<void> {
   }
 
   const viewsDir = options.viewsDir
-    ?? (options.databaseId ? resolveViewsDir(options.databaseId) : null);
+    ?? (options.databaseId ? getDefaultViewsDir(options.databaseId) : null);
 
   const state = {
     mode: options.mode ?? "default",

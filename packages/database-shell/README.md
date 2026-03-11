@@ -36,6 +36,7 @@ bsql <url> --unmask
 | `--mode <mode>`   | Output mode: `default`, `table`, `json`, `csv`, `markdown` |
 | `--unmask`        | Show sensitive column values unmasked                |
 | `--timing`        | Show query execution timing                          |
+| `--views-dir`     | Directory for saved views (default: `~/.config/bunny/views/<db-id>/`) |
 | `--help`          | Show help                                            |
 
 ## Library Usage
@@ -161,12 +162,7 @@ Available in interactive mode:
 
 ## Saved Views
 
-Save frequently used queries as named views so you can recall them later. Views are scoped per database and stored as `.sql` files.
-
-The shell looks for views in this order:
-
-1. **Local** `.bunny/<databaseId>/queries/` — walks up from CWD to find a `.bunny` directory (committable, shared with your team)
-2. **Global** `~/.config/bunny/views/<databaseId>/` — personal fallback
+Save frequently used queries as named views so you can recall them later. Views are scoped per database and stored as plain `.sql` files in `~/.config/bunny/views/<databaseId>/` (respects `XDG_CONFIG_HOME`).
 
 ```sql
 →  SELECT name, count(*) as orders FROM users JOIN orders USING (user_id) GROUP BY name ORDER BY orders DESC LIMIT 10;

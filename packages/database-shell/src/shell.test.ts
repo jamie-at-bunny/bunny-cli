@@ -15,8 +15,6 @@ import {
   saveHistory,
   splitStatements,
   getDefaultViewsDir,
-  findLocalViewsDir,
-  resolveViewsDir,
   isValidViewName,
   saveView,
   loadView,
@@ -698,47 +696,5 @@ describe("views", () => {
     saveView(tmpDir, "my-query", "SELECT 1;");
     saveView(tmpDir, "my-query", "SELECT 2;");
     expect(loadView(tmpDir, "my-query")).toBe("SELECT 2;");
-  });
-
-  test("findLocalViewsDir returns path when .bunny exists", () => {
-    mkdirSync(join(tmpDir, ".bunny"), { recursive: true });
-    const result = findLocalViewsDir("db-123", tmpDir);
-    expect(result).toBe(join(tmpDir, ".bunny", "db-123", "queries"));
-  });
-
-  test("findLocalViewsDir walks up to find .bunny", () => {
-    const nested = join(tmpDir, "a", "b", "c");
-    mkdirSync(nested, { recursive: true });
-    mkdirSync(join(tmpDir, ".bunny"), { recursive: true });
-    const result = findLocalViewsDir("db-123", nested);
-    expect(result).toBe(join(tmpDir, ".bunny", "db-123", "queries"));
-  });
-
-  test("findLocalViewsDir returns null when no .bunny found", () => {
-    const result = findLocalViewsDir("db-123", tmpDir);
-    expect(result).toBeNull();
-  });
-
-  test("resolveViewsDir prefers local .bunny over global", () => {
-    mkdirSync(join(tmpDir, ".bunny"), { recursive: true });
-    const original = process.cwd;
-    process.cwd = () => tmpDir;
-    try {
-      const dir = resolveViewsDir("db-123");
-      expect(dir).toBe(join(tmpDir, ".bunny", "db-123", "queries"));
-    } finally {
-      process.cwd = original;
-    }
-  });
-
-  test("resolveViewsDir falls back to global when no .bunny", () => {
-    const original = process.cwd;
-    process.cwd = () => tmpDir;
-    try {
-      const dir = resolveViewsDir("db-123");
-      expect(dir).toBe(getDefaultViewsDir("db-123"));
-    } finally {
-      process.cwd = original;
-    }
   });
 });
