@@ -49,7 +49,7 @@ export async function executeDotCommand(
   rl: readline.Interface,
   logger: ShellLogger,
 ): Promise<"quit" | "handled" | "unknown"> {
-  const parts = command.trim().split(/\s+/);
+  const parts = command.trim().replace(/;+$/, "").split(/\s+/);
   const cmd = parts[0]!.toLowerCase();
   const PRINT_MODES: PrintMode[] = [
     "default",
