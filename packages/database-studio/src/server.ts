@@ -38,9 +38,54 @@ function json(data: unknown, status = 200) {
   });
 }
 
-/** Validate a table name to prevent SQL injection (only allow alphanumeric, underscores). */
-function isValidTableName(name: string): boolean {
+/** Validate a table/column name to prevent SQL injection (only allow alphanumeric, underscores). */
+function isValidIdentifier(name: string): boolean {
   return /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(name);
+}
+
+const VALID_OPERATORS = new Set([
+  "=", "!=", ">", "<", ">=", "<=", "LIKE", "NOT LIKE", "IS NULL", "IS NOT NULL",
+]);
+
+interface Filter {
+  column: string;
+  operator: string;
+  value: string;
+}
+
+function parseFilters(url: URL): Filter[] {
+  const raw = url.searchParams.get("filters");
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (f: any) =>
+        typeof f.column === "string" &&
+        typeof f.operator === "string" &&
+        isValidIdentifier(f.column) &&
+        VALID_OPERATORS.has(f.operator),
+    );
+  } catch {
+    return [];
+  }
+}
+
+function buildWhereClause(filters: Filter[]): { sql: string; args: (string | null)[] } {
+  if (filters.length === 0) return { sql: "", args: [] };
+  const conditions: string[] = [];
+  const args: (string | null)[] = [];
+  for (const f of filters) {
+    if (f.operator === "IS NULL") {
+      conditions.push(`"${f.column}" IS NULL`);
+    } else if (f.operator === "IS NOT NULL") {
+      conditions.push(`"${f.column}" IS NOT NULL`);
+    } else {
+      conditions.push(`"${f.column}" ${f.operator} ?`);
+      args.push(f.value);
+    }
+  }
+  return { sql: ` WHERE ${conditions.join(" AND ")}`, args };
 }
 
 function createApiHandler(client: Client) {
@@ -66,7 +111,7 @@ function createApiHandler(client: Client) {
     const schemaMatch = pathname.match(/^\/api\/tables\/([^/]+)\/schema$/);
     if (schemaMatch) {
       const tableName = decodeURIComponent(schemaMatch[1]!);
-      if (!isValidTableName(tableName)) return json({ error: "Invalid table name" }, 400);
+      if (!isValidIdentifier(tableName)) return json({ error: "Invalid table name" }, 400);
 
       const result = await client.execute(`PRAGMA table_info("${tableName}")`);
       const columns = result.rows.map((row) => ({
@@ -98,16 +143,25 @@ function createApiHandler(client: Client) {
     const rowsMatch = pathname.match(/^\/api\/tables\/([^/]+)\/rows$/);
     if (rowsMatch) {
       const tableName = decodeURIComponent(rowsMatch[1]!);
-      if (!isValidTableName(tableName)) return json({ error: "Invalid table name" }, 400);
+      if (!isValidIdentifier(tableName)) return json({ error: "Invalid table name" }, 400);
 
       const url = new URL(req.url);
       const page = Math.max(1, Number(url.searchParams.get("page") ?? 1));
       const limit = Math.min(100, Math.max(1, Number(url.searchParams.get("limit") ?? 50)));
       const offset = (page - 1) * limit;
 
+      const filters = parseFilters(url);
+      const where = buildWhereClause(filters);
+
       const [dataResult, countResult] = await Promise.all([
-        client.execute(`SELECT * FROM "${tableName}" LIMIT ${limit} OFFSET ${offset}`),
-        client.execute(`SELECT COUNT(*) as count FROM "${tableName}"`),
+        client.execute({
+          sql: `SELECT * FROM "${tableName}"${where.sql} LIMIT ${limit} OFFSET ${offset}`,
+          args: where.args,
+        }),
+        client.execute({
+          sql: `SELECT COUNT(*) as count FROM "${tableName}"${where.sql}`,
+          args: where.args,
+        }),
       ]);
 
       const totalRows = Number(countResult.rows[0]?.count ?? 0);
@@ -123,6 +177,54 @@ function createApiHandler(client: Client) {
           totalRows,
           totalPages: Math.ceil(totalRows / limit),
         },
+      });
+    }
+
+    // GET /api/tables/:name/lookup?column=col&value=val
+    const lookupMatch = pathname.match(/^\/api\/tables\/([^/]+)\/lookup$/);
+    if (lookupMatch) {
+      const tableName = decodeURIComponent(lookupMatch[1]!);
+      if (!isValidIdentifier(tableName)) return json({ error: "Invalid table name" }, 400);
+
+      const url = new URL(req.url);
+      const column = url.searchParams.get("column");
+      const value = url.searchParams.get("value");
+      if (!column) return json({ error: "Missing column parameter" }, 400);
+
+      // Validate column name
+      if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(column)) {
+        return json({ error: "Invalid column name" }, 400);
+      }
+
+      const result = await client.execute({
+        sql: `SELECT * FROM "${tableName}" WHERE "${column}" = ? LIMIT 1`,
+        args: [value ?? null],
+      });
+
+      if (result.rows.length === 0) {
+        return json({ error: "Row not found" }, 404);
+      }
+
+      // Also fetch schema for column types
+      const schemaResult = await client.execute(`PRAGMA table_info("${tableName}")`);
+      const columns = schemaResult.columns;
+      const schemaColumns = schemaResult.rows.map((row) => ({
+        name: row.name,
+        type: row.type,
+      }));
+
+      const fkResult = await client.execute(`PRAGMA foreign_key_list("${tableName}")`);
+      const foreignKeys = fkResult.rows.map((row) => ({
+        from: row.from,
+        table: row.table,
+        to: row.to,
+      }));
+
+      return json({
+        row: result.rows[0],
+        columns: result.columns,
+        schema: schemaColumns,
+        foreignKeys,
       });
     }
 
