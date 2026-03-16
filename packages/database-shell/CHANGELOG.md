@@ -1,5 +1,13 @@
 # @bunny.net/database-shell
 
+## 0.2.1
+
+### Patch Changes
+
+- [#18](https://github.com/BunnyWay/cli/pull/18) [`742d018`](https://github.com/BunnyWay/cli/commit/742d0187f82cc7a0dd1acee89f997b1e276c4511) Thanks [@jamie-at-bunny](https://github.com/jamie-at-bunny)! - use batching for execute file
+
+- [#18](https://github.com/BunnyWay/cli/pull/18) [`742d018`](https://github.com/BunnyWay/cli/commit/742d0187f82cc7a0dd1acee89f997b1e276c4511) Thanks [@jamie-at-bunny](https://github.com/jamie-at-bunny)! - fix clear history command
+
 ## 0.2.0
 
 ### Minor Changes
