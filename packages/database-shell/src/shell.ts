@@ -67,22 +67,20 @@ export async function executeFile(
   logger.dim(
     `  Executing ${statements.length} statement${statements.length === 1 ? "" : "s"} from ${filePath}`,
   );
-  for (const stmt of statements) {
-    try {
-      const t0 = performance.now();
-      const result = await client.execute(stmt);
-      const elapsed = performance.now() - t0;
+
+  try {
+    const t0 = performance.now();
+    const results = await client.batch(statements);
+    const elapsed = performance.now() - t0;
+    for (const result of results) {
       printResultSet(result, mode, masked, logger);
-      if (timing) {
-        logger.log(chalk.dim(`  ${elapsed.toFixed(1)}ms`));
-      }
-    } catch (err: any) {
-      logger.error(`${err.message}`);
-      logger.dim(
-        `  Statement: ${stmt.length > 80 ? stmt.slice(0, 80) + "..." : stmt}`,
-      );
-      return;
     }
+    if (timing) {
+      logger.log(chalk.dim(`  ${elapsed.toFixed(1)}ms`));
+    }
+  } catch (err: any) {
+    logger.error(`${err.message}`);
+    return;
   }
   logger.success(
     `${statements.length} statement${statements.length === 1 ? "" : "s"} executed.`,
@@ -139,7 +137,14 @@ export async function startShell(options: ShellOptions): Promise<void> {
 
   let buffer: string[] = [];
 
-  rl.on("line", async (line: string) => {
+  // Serialize async line handling so pasted multi-statement blocks execute in order.
+  let queue: Promise<void> = Promise.resolve();
+
+  rl.on("line", (line: string) => {
+    queue = queue.then(() => handleLine(line));
+  });
+
+  async function handleLine(line: string): Promise<void> {
     const trimmed = line.trim();
 
     // Empty line
@@ -206,7 +211,7 @@ export async function startShell(options: ShellOptions): Promise<void> {
 
     logger.log();
     rl.prompt();
-  });
+  }
 
   rl.on("SIGINT", () => {
     if (buffer.length > 0) {
