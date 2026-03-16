@@ -1,0 +1,15 @@
+{
+  "name": "@bunny.net/database-openapi",
+  "version": "0.1.0",
+  "type": "module",
+  "module": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

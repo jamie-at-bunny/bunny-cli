@@ -34,7 +34,7 @@
     },
     "packages/cli": {
       "name": "@bunny.net/cli",
-      "version": "0.1.1",
+      "version": "0.2.0",
       "bin": {
         "bunny": "./bin/bunny.cjs",
       },
@@ -64,27 +64,34 @@
     },
     "packages/cli-darwin-arm64": {
       "name": "@bunny.net/cli-darwin-arm64",
-      "version": "0.1.1",
+      "version": "0.2.0",
     },
     "packages/cli-darwin-x64": {
       "name": "@bunny.net/cli-darwin-x64",
-      "version": "0.1.1",
+      "version": "0.2.0",
     },
     "packages/cli-linux-arm64": {
       "name": "@bunny.net/cli-linux-arm64",
-      "version": "0.1.1",
+      "version": "0.2.0",
     },
     "packages/cli-linux-x64": {
       "name": "@bunny.net/cli-linux-x64",
-      "version": "0.1.1",
+      "version": "0.2.0",
     },
     "packages/cli-windows-x64": {
       "name": "@bunny.net/cli-windows-x64",
-      "version": "0.1.1",
+      "version": "0.2.0",
+    },
+    "packages/database-openapi": {
+      "name": "@bunny.net/database-openapi",
+      "version": "0.1.0",
+      "dependencies": {
+        "@libsql/client": "^0.17.0",
+      },
     },
     "packages/database-shell": {
       "name": "@bunny.net/database-shell",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "bin": {
         "bsql": "./bin/bsql.cjs",
       },
@@ -103,23 +110,23 @@
     },
     "packages/database-shell-darwin-arm64": {
       "name": "@bunny.net/database-shell-darwin-arm64",
-      "version": "0.1.0",
+      "version": "0.2.0",
     },
     "packages/database-shell-darwin-x64": {
       "name": "@bunny.net/database-shell-darwin-x64",
-      "version": "0.1.0",
+      "version": "0.2.0",
     },
     "packages/database-shell-linux-arm64": {
       "name": "@bunny.net/database-shell-linux-arm64",
-      "version": "0.1.0",
+      "version": "0.2.0",
     },
     "packages/database-shell-linux-x64": {
       "name": "@bunny.net/database-shell-linux-x64",
-      "version": "0.1.0",
+      "version": "0.2.0",
     },
     "packages/database-shell-windows-x64": {
       "name": "@bunny.net/database-shell-windows-x64",
-      "version": "0.1.0",
+      "version": "0.2.0",
     },
   },
   "packages": {
@@ -144,6 +151,8 @@
     "@bunny.net/cli-linux-x64": ["@bunny.net/cli-linux-x64@workspace:packages/cli-linux-x64"],
 
     "@bunny.net/cli-windows-x64": ["@bunny.net/cli-windows-x64@workspace:packages/cli-windows-x64"],
+
+    "@bunny.net/database-openapi": ["@bunny.net/database-openapi@workspace:packages/database-openapi"],
 
     "@bunny.net/database-shell": ["@bunny.net/database-shell@workspace:packages/database-shell"],
 
