@@ -189,6 +189,15 @@ export const dbRegionsRemoveCommand = defineCommand<RemoveArgs>({
       );
     }
 
+    if (
+      db.replicas_regions.length > 0 &&
+      updatedReplicas.length === 0
+    ) {
+      logger.warn(
+        "This will remove all read replicas from your database.",
+      );
+    }
+
     const parts: string[] = [];
     if (removePrimary.size > 0) {
       const names = [...removePrimary]
