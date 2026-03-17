@@ -3,7 +3,7 @@ import { defineCommand } from "../../../core/define-command.ts";
 import { resolveConfig } from "../../../config/index.ts";
 import { createDbClient } from "@bunny.net/api";
 import { resolveDbId } from "../resolve-db.ts";
-import { spinner } from "../../../core/ui.ts";
+import { confirm, spinner } from "../../../core/ui.ts";
 import { logger } from "../../../core/logger.ts";
 import { UserError } from "../../../core/errors.ts";
 import { formatTable } from "../../../core/format.ts";
@@ -20,11 +20,13 @@ const DESCRIPTION = "Remove regions from a database.";
 
 const ARG_PRIMARY = "primary";
 const ARG_REPLICAS = "replicas";
+const ARG_FORCE = "force";
 
 interface RemoveArgs {
   [ARG_DATABASE_ID]?: string;
   [ARG_PRIMARY]?: string;
   [ARG_REPLICAS]?: string;
+  [ARG_FORCE]?: boolean;
 }
 
 /**
@@ -43,6 +45,9 @@ interface RemoveArgs {
  *
  * # Remove replica regions
  * bunny db regions remove --replicas UK
+ *
+ * # Skip confirmation prompt
+ * bunny db regions remove --primary FR --force
  * ```
  */
 export const dbRegionsRemoveCommand = defineCommand<RemoveArgs>({
@@ -52,6 +57,7 @@ export const dbRegionsRemoveCommand = defineCommand<RemoveArgs>({
     ["$0 db regions remove", "Interactive — select regions to remove"],
     ["$0 db regions remove --primary FR,DE", "Remove specific primary regions"],
     ["$0 db regions remove --replicas UK", "Remove replica regions"],
+    ["$0 db regions remove --primary FR --force", "Skip confirmation prompt"],
   ],
   describe: DESCRIPTION,
 
@@ -69,12 +75,17 @@ export const dbRegionsRemoveCommand = defineCommand<RemoveArgs>({
       .option(ARG_REPLICAS, {
         type: "string",
         describe: "Comma-separated replica region IDs to remove (e.g. UK)",
+      })
+      .option(ARG_FORCE, {
+        type: "boolean",
+        describe: "Skip confirmation prompt",
       }),
 
   handler: async ({
     [ARG_DATABASE_ID]: databaseIdArg,
     primary: primaryArg,
     replicas: replicasArg,
+    force,
     profile,
     output,
     verbose,
@@ -176,6 +187,29 @@ export const dbRegionsRemoveCommand = defineCommand<RemoveArgs>({
         "Cannot remove all primary regions.",
         "At least one primary region is required.",
       );
+    }
+
+    const parts: string[] = [];
+    if (removePrimary.size > 0) {
+      const names = [...removePrimary]
+        .map((id) => regionNames.get(id) ?? id)
+        .join(", ");
+      parts.push(`primary: ${names}`);
+    }
+    if (removeReplicas.size > 0) {
+      const names = [...removeReplicas]
+        .map((id) => regionNames.get(id) ?? id)
+        .join(", ");
+      parts.push(`replica: ${names}`);
+    }
+
+    const confirmed = await confirm(
+      `Remove regions from "${db.name}" (${parts.join("; ")})?`,
+      { force },
+    );
+    if (!confirmed) {
+      logger.info("Aborted.");
+      return;
     }
 
     const updateSpin = spinner("Updating regions...");
