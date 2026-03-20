@@ -175,8 +175,7 @@ export const dbShellCommand = defineCommand<{
     verbose,
     apiKey,
   }) => {
-    const { createClient } = await import("@libsql/client/web");
-    const { startShell, executeQuery, executeFile } = await import("@bunny.net/database-shell");
+    const { createShellClient, startShell, executeQuery, executeFile } = await import("@bunny.net/database-shell");
 
     // If database-id doesn't look like a database ID, treat it as the query
     let databaseId = databaseIdArg;
@@ -204,7 +203,7 @@ export const dbShellCommand = defineCommand<{
       verbose,
     );
 
-    const client = createClient({ url, authToken: token });
+    const client = createShellClient({ url, authToken: token });
     const log = shellLogger();
 
     // Non-interactive: execute and exit

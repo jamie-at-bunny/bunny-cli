@@ -1,4 +1,5 @@
 // Public API
+export { createShellClient } from "./client.ts";
 export { startShell, executeQuery, executeFile } from "./shell.ts";
 
 // Types

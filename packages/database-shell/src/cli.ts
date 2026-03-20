@@ -1,7 +1,6 @@
 #!/usr/bin/env bun
 
-import { createClient } from "@libsql/client/web";
-import { startShell, executeQuery, executeFile, PRINT_MODES } from "./index.ts";
+import { createShellClient, startShell, executeQuery, executeFile, PRINT_MODES } from "./index.ts";
 import type { PrintMode } from "./types.ts";
 
 function printUsage() {
@@ -74,10 +73,7 @@ async function main() {
     process.exit(help ? 0 : 1);
   }
 
-  const client = createClient({
-    url,
-    authToken: token,
-  });
+  const client = createShellClient({ url, authToken: token });
 
   const options = { mode, masked: !unmask, timing };
 
